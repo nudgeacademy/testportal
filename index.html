@@ -2943,8 +2943,9 @@
 
         function payForLockedExam() {
             if (currentLockedFolder) {
+                const folder = currentLockedFolder; // Store reference before closing
                 closeLockedExamModal();
-                buyFolder(currentLockedFolder);
+                buyFolder(folder);
             }
         }
 
