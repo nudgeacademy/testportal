@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#dc2626">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Exam | Nudge Academy Mock Tests</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            --primary-bg: #fef2f2;
+            --dark: #0f172a;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-lg: 16px;
+        }
+
+        /* Table Styles for Question Content */
+        #questionText table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        #questionText th,
+        #questionText td {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-200);
+            text-align: left;
+        }
+
+        #questionText th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        #questionText tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        #questionText p {
+            margin-bottom: 0.75rem;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: manipulation;
+            /* Disables double-tap to zoom */
+        }
+
+        /* Instructions Overlay */
+        .instructions-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .instructions-overlay.hidden {
+            display: none;
+        }
+
+        .instructions-card {
+            background: white;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2.5rem;
+        }
+
+        .instructions-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .instructions-header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions-header p {
+            color: #64748b;
+        }
+
+        .test-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .test-info-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .test-info-item .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #dc2626;
+        }
+
+        .test-info-item .label {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .instructions-section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instructions-list {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .instructions-list li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #475569;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .instructions-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .legend-color {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: white;
+        }
+
+        .legend-color.not-visited {
+            background: #94a3b8;
+        }
+
+        .legend-color.not-answered {
+            background: #ef4444;
+        }
+
+        .legend-color.answered {
+            background: #22c55e;
+        }
+
+        .legend-color.marked {
+            background: #8b5cf6;
+        }
+
+        .legend-color.marked-answered {
+            background: #8b5cf6;
+            border: 3px solid #22c55e;
+        }
+
+        .legend-text {
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .agreement-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .agreement-box label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .agreement-box input {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: #dc2626;
+        }
+
+        .agreement-box span {
+            font-size: 0.9rem;
+            color: #991b1b;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-start:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .btn-start:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Exam Interface */
+        .exam-container {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .exam-container.active {
+            display: flex;
+        }
+
+        .exam-header {
+            background: white;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f1f5f9;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .exam-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .exam-logo h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #dc2626;
+        }
+
+        .exam-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .exam-timer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f8fafc;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .exam-timer.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .exam-timer.danger {
+            background: #fef2f2;
+            color: #dc2626;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .exam-user {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .exam-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #dc2626;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .exam-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Question Panel */
+        .question-panel {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-number {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .question-status {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.marks {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-badge.negative {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #1e293b;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.25rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .option-item.selected {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .option-letter {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #64748b;
+            flex-shrink: 0;
+        }
+
+        .option-item.selected .option-letter {
+            background: #dc2626;
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+            padding-top: 0.375rem;
+            color: #1e293b;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn-action {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-clear {
+            background: #f1f5f9;
+            border: none;
+            color: #475569;
+        }
+
+        .btn-clear:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-mark {
+            background: #f5f3ff;
+            border: 2px solid #8b5cf6;
+            color: #7c3aed;
+        }
+
+        .btn-mark:hover {
+            background: #ede9fe;
+        }
+
+        .btn-mark.marked {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .btn-nav {
+            background: #dc2626;
+            border: none;
+            color: white;
+        }
+
+        .btn-nav:hover {
+            background: #b91c1c;
+        }
+
+        .btn-nav:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        /* Navigation Panel */
+        .nav-panel {
+            width: 320px;
+            background: #f8fafc;
+            border-left: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .nav-header {
+            padding: 1.25rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nav-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .nav-legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            padding: 1rem 1.25rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nav-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .nav-legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .nav-legend-color.not-visited {
+            background: #94a3b8;
+        }
+
+        .nav-legend-color.not-answered {
+            background: #ef4444;
+        }
+
+        .nav-legend-color.answered {
+            background: #22c55e;
+        }
+
+        .nav-legend-color.marked {
+            background: #8b5cf6;
+        }
+
+        .nav-palette {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        .palette-btn {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #94a3b8;
+            color: white;
+        }
+
+        .palette-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .palette-btn.current {
+            box-shadow: 0 0 0 3px #0f172a;
+        }
+
+        .palette-btn.not-answered {
+            background: #ef4444;
+        }
+
+        .palette-btn.answered {
+            background: #22c55e;
+        }
+
+        .palette-btn.marked {
+            background: #8b5cf6;
+        }
+
+        .palette-btn.marked-answered {
+            background: #8b5cf6;
+            box-shadow: inset 0 -4px 0 #22c55e;
+        }
+
+        .nav-stats {
+            padding: 1rem 1.25rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.85rem;
+        }
+
+        .stats-row .label {
+            color: #64748b;
+        }
+
+        .stats-row .value {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .nav-submit {
+            padding: 1rem 1.25rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Submit Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #fef2f2;
+            color: #dc2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-content p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-stat {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .modal-stat .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .modal-stat .label {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 0.875rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            border: none;
+            color: #475569;
+        }
+
+        .btn-cancel:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-confirm {
+            background: #dc2626;
+            border: none;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #b91c1c;
+        }
+
+        /* Warning Toast */
+        .warning-toast {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            color: #92400e;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            z-index: 2000;
+            transition: transform 0.3s ease;
+        }
+
+        .warning-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Hide mobile-only elements by default (shown in mobile media query) */
+        .mobile-actions-bar {
+            display: none;
+        }
+
+        /* Mobile Responsive - Complete Exam Redesign */
+        @media (max-width: 768px) {
+            .exam-header {
+                padding: 10px 16px;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            }
+
+            .exam-logo h1 {
+                font-size: 0.95rem;
+                color: white;
+            }
+
+            .exam-logo h1 img {
+                height: 32px !important;
+            }
+
+            .exam-title,
+            .exam-user {
+                display: none;
+            }
+
+            .exam-timer {
+                padding: 8px 14px;
+                border-radius: 12px;
+                font-size: 1.1rem;
+                background: rgba(220, 38, 38, 0.15);
+                border: 1px solid rgba(220, 38, 38, 0.3);
+            }
+
+            .exam-timer svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .exam-body {
+                flex-direction: column;
+                position: relative;
+                min-height: calc(100vh - 60px);
+            }
+
+            .question-panel {
+                padding: 16px;
+                padding-bottom: 100px;
+                /* Space for mobile action bar */
+                flex: 1;
+                overflow-y: auto;
+            }
+
+            .question-header {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid var(--gray-100);
+            }
+
+            .question-number {
+                font-size: 1rem;
+                font-weight: 700;
+                color: var(--dark);
+            }
+
+            .question-status {
+                display: flex;
+                gap: 6px;
+            }
+
+            .status-badge {
+                padding: 4px 10px;
+                font-size: 0.75rem;
+                border-radius: 6px;
+            }
+
+            .question-text {
+                font-size: 1rem;
+                line-height: 1.6;
+                padding: 16px;
+                background: var(--gray-50);
+                border-radius: 12px;
+                margin-bottom: 16px;
+            }
+
+            .option-item {
+                padding: 14px 16px;
+                border-radius: 12px;
+                margin-bottom: 10px;
+                border: 2px solid var(--gray-200);
+                transition: all 0.2s ease;
+            }
+
+            .option-item:active {
+                transform: scale(0.98);
+            }
+
+            .option-item.selected {
+                border-color: var(--primary);
+                background: var(--primary-bg);
+            }
+
+            .option-label {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+                font-weight: 700;
+            }
+
+            .option-text {
+                font-size: 0.95rem;
+                line-height: 1.5;
+            }
+
+            /* Hide desktop question actions */
+            .question-actions {
+                display: none;
+            }
+
+            /* Mobile Actions Bar - Fixed Bottom */
+            .mobile-actions-bar {
+                display: flex !important;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 12px 16px;
+                border-top: 1px solid var(--gray-200);
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+                z-index: 100;
+                gap: 8px;
+            }
+
+            .mobile-action-btn {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                padding: 10px 8px;
+                background: var(--gray-50);
+                border: 1px solid var(--gray-200);
+                border-radius: 10px;
+                font-family: var(--font);
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--gray-600);
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .mobile-action-btn:active {
+                transform: scale(0.95);
+            }
+
+            .mobile-action-btn svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .mobile-action-btn.mark {
+                color: #f59e0b;
+                background: #fef3c7;
+                border-color: #fcd34d;
+            }
+
+            .mobile-action-btn.clear {
+                color: #64748b;
+            }
+
+            .mobile-action-btn.primary {
+                background: var(--primary);
+                border-color: var(--primary);
+                color: white;
+                flex: 1.5;
+            }
+
+            .mobile-action-btn.primary:active {
+                background: #b91c1c;
+            }
+
+            /* Nav Panel as Bottom Sheet */
+            .nav-panel {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 80vh;
+                /* Increased height for full palette visibility */
+                max-height: 80vh;
+                border-top: none;
+                z-index: 150;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border-radius: 24px 24px 0 0;
+                box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                background: white;
+            }
+
+            .nav-panel.open {
+                transform: translateY(0);
+            }
+
+            .nav-header {
+                padding: 16px 20px;
+                border-bottom: 1px solid var(--gray-200);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .nav-header h3 {
+                font-size: 1rem;
+            }
+
+            .nav-palette {
+                padding: 16px;
+                flex: 1;
+                /* Take remaining space */
+                overflow-y: auto;
+                max-height: none;
+                /* Remove previous constraint */
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .palette-grid {
+                display: grid;
+                grid-template-columns: repeat(6, 1fr);
+                gap: 8px;
+            }
+
+            .palette-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 0.85rem;
+            }
+
+            /* Floating Nav Toggle */
+            /* Floating Nav Toggle - Repositioned inside question header */
+            .mobile-nav-toggle {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 38px;
+                height: 38px;
+                background: var(--white);
+                color: var(--dark);
+                border-radius: 8px;
+                border: 1px solid var(--gray-200);
+                box-shadow: var(--shadow-sm);
+                z-index: 10;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+            }
+
+            .mobile-nav-toggle:active {
+                transform: scale(0.9);
+            }
+
+            /* Nav Panel Overlay */
+            .nav-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 140;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .nav-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            /* Instructions Overlay */
+            .instructions-card {
+                padding: 24px;
+                max-height: 90vh;
+                border-radius: 16px;
+            }
+
+            .instructions-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .instructions-header p {
+                font-size: 0.9rem;
+            }
+
+            .test-info-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .test-info-item {
+                padding: 12px 8px;
+            }
+
+            .test-info-item .value {
+                font-size: 1.25rem;
+            }
+
+            .test-info-item .label {
+                font-size: 0.7rem;
+            }
+
+            .instructions-section h3 {
+                font-size: 0.95rem;
+                margin-bottom: 10px;
+            }
+
+            .instructions-list li {
+                font-size: 0.85rem;
+                padding: 8px 0 8px 24px;
+            }
+
+            .legend-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .legend-color {
+                width: 28px;
+                height: 28px;
+                font-size: 0.75rem;
+            }
+
+            .legend-text {
+                font-size: 0.8rem;
+            }
+
+            .agreement-box {
+                padding: 12px;
+            }
+
+            .agreement-box span {
+                font-size: 0.85rem;
+            }
+
+            .btn-start {
+                padding: 14px 28px;
+                font-size: 1rem;
+            }
+
+            /* Submit Modal on Mobile */
+            .modal-content {
+                padding: 24px;
+                width: 90%;
+            }
+
+            .modal-header h2 {
+                font-size: 1.25rem;
+            }
+
+            .modal-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .modal-stat {
+                padding: 12px;
+            }
+
+            .modal-stat .value {
+                font-size: 1.25rem;
+            }
+
+            .modal-stat .label {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Mobile Toggle Button */
+        .mobile-nav-toggle {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-nav-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                background: var(--primary-bg);
+                color: var(--primary);
+                border-radius: 8px;
+                border: none;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .exam-header {
+                padding: 8px 12px;
+            }
+
+            .exam-logo h1 {
+                font-size: 0;
+            }
+
+            .exam-logo h1 img {
+                height: 28px !important;
+            }
+
+            .exam-timer {
+                padding: 6px 10px;
+                font-size: 1rem;
+            }
+
+            .question-panel {
+                padding: 12px;
+                padding-bottom: 90px;
+            }
+
+            .question-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                position: relative;
+                /* For absolute positioning of toggle */
+                padding-right: 40px;
+                /* Space for toggler */
+            }
+
+            .question-number {
+                font-size: 0.95rem;
+            }
+
+            .question-text {
+                font-size: 0.95rem;
+                padding: 12px;
+            }
+
+            .option-item {
+                padding: 12px 14px;
+            }
+
+            .option-label {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+
+            .option-text {
+                font-size: 0.9rem;
+            }
+
+            /* Mobile action buttons - more compact */
+            .mobile-actions-bar {
+                padding: 10px 12px;
+                gap: 6px;
+            }
+
+            .mobile-action-btn {
+                padding: 8px 6px;
+                font-size: 0.7rem;
+            }
+
+            .mobile-action-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            .mobile-action-btn span {
+                font-size: 0.65rem;
+            }
+
+            .mobile-nav-toggle {
+                width: 44px;
+                height: 44px;
+                bottom: 80px;
+            }
+
+            .instructions-card {
+                padding: 16px;
+            }
+
+            .instructions-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .test-info-item {
+                padding: 10px 6px;
+            }
+
+            .test-info-item .value {
+                font-size: 1.1rem;
+            }
+
+            .btn-start {
+                padding: 12px 24px;
+                font-size: 0.95rem;
+            }
+
+            .palette-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .palette-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .exam-logo h1 {
+                font-size: 0.85rem;
+            }
+
+            .exam-logo h1 img {
+                height: 24px !important;
+                margin-right: 4px !important;
+            }
+
+            .mobile-nav-toggle {
+                width: 36px;
+                height: 36px;
+            }
+
+            .question-number {
+                font-size: 0.9rem;
+            }
+
+            .status-badge {
+                padding: 3px 8px;
+                font-size: 0.7rem;
+            }
+
+            .test-info-grid {
+                gap: 6px;
+            }
+
+            .test-info-item .value {
+                font-size: 1rem;
+            }
+
+            .legend-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Instructions Overlay -->
+    <div class="instructions-overlay" id="instructionsOverlay">
+        <div class="instructions-card">
+            <div class="instructions-header">
+                <h1 id="testTitle">CUET Mock Test</h1>
+                <p>Please read all instructions carefully before starting</p>
+            </div>
+
+            <div class="test-info-grid">
+                <div class="test-info-item">
+                    <div class="value" id="infoQuestions">75</div>
+                    <div class="label">Questions</div>
+                </div>
+                <div class="test-info-item">
+                    <div class="value" id="infoDuration">60</div>
+                    <div class="label">Minutes</div>
+                </div>
+                <div class="test-info-item">
+                    <div class="value" id="infoMarks">300</div>
+                    <div class="label">Total Marks</div>
+                </div>
+            </div>
+
+            <div class="instructions-section">
+                <h3>📋 General Instructions</h3>
+                <ul class="instructions-list">
+                    <li>Each correct answer carries <strong>+4 marks</strong></li>
+                    <li>Each wrong answer carries <strong>-1 mark</strong> (negative marking)</li>
+                    <li>Unattempted questions carry <strong>0 marks</strong></li>
+                    <li>You can navigate between questions using the question palette</li>
+                    <li>You can mark questions for review and revisit them later</li>
+                    <li>The test will auto-submit when time expires</li>
+                </ul>
+            </div>
+
+            <div class="instructions-section">
+                <h3>🎨 Question Status Legend</h3>
+                <div class="legend-grid">
+                    <div class="legend-item">
+                        <div class="legend-color not-visited">1</div>
+                        <span class="legend-text">Not Visited</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color not-answered">2</div>
+                        <span class="legend-text">Not Answered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color answered">3</div>
+                        <span class="legend-text">Answered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color marked">4</div>
+                        <span class="legend-text">Marked for Review</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="instructions-section">
+                <h3>⚠️ Important Notes</h3>
+                <ul class="instructions-list">
+                    <li>Do not refresh or close the browser during the test</li>
+                    <li>Switching tabs multiple times may result in auto-submission</li>
+                    <li>Ensure stable internet connection throughout</li>
+                </ul>
+            </div>
+
+            <div class="agreement-box">
+                <label>
+                    <input type="checkbox" id="agreeCheckbox">
+                    <span>I have read and understood all the instructions. I agree to start the test and will not engage
+                        in any unfair practices.</span>
+                </label>
+            </div>
+
+            <button class="btn-start" id="startTestBtn" disabled>Start Test</button>
+        </div>
+    </div>
+
+    <!-- Exam Interface -->
+    <div class="exam-container" id="examContainer">
+        <header class="exam-header">
+            <div class="exam-logo">
+                <!-- Hamburger moved to question header -->
+                <h1><img src="NUDGE_LOGO.png" alt="Nudge Academy"
+                        style="height: 40px; width: auto; vertical-align: middle; margin-right: 8px;">Nudge Academy</h1>
+            </div>
+            <div class="exam-title" id="examTitle">Mock Test</div>
+            <div class="exam-timer" id="examTimer">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span id="timerDisplay">60:00</span>
+            </div>
+            <div class="exam-user">
+                <div class="exam-user-avatar" id="examUserAvatar">S</div>
+            </div>
+        </header>
+
+        <div class="exam-body">
+            <div class="question-panel">
+                <div class="question-header">
+                    <div class="question-number">Question <span id="currentQNum">1</span> of <span
+                            id="totalQNum">75</span></div>
+                    <div class="question-status">
+                        <span class="status-badge marks" id="infoPositiveMarks">+4 marks</span>
+                        <span class="status-badge negative" id="infoNegativeMarks">-1 wrong</span>
+                    </div>
+                    <!-- Mobile Nav Toggle Parallel to Header -->
+                    <button class="mobile-nav-toggle" id="mobileNavToggle">☰</button>
+                </div>
+                <div class="question-text" id="questionText">Loading question...</div>
+                <div class="options-list" id="optionsList"></div>
+                <div class="question-actions">
+                    <button class="btn-action btn-clear" id="clearBtn">Clear Response</button>
+                    <button class="btn-action btn-mark" id="markBtn">Mark for Review</button>
+                    <div class="spacer"></div>
+                    <button class="btn-action btn-nav" id="prevBtn">Previous</button>
+                    <button class="btn-action btn-nav" id="nextBtn">Save & Next</button>
+                </div>
+
+                <!-- Mobile Actions Bar - Completely redesigned -->
+                <div class="mobile-actions-bar" id="mobileActionsBar">
+                    <button class="mobile-action-btn prev" id="mobilePrevBtn"
+                        onclick="document.getElementById('prevBtn').click()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                            </path>
+                        </svg>
+                        <span>Prev</span>
+                    </button>
+                    <button class="mobile-action-btn mark" onclick="document.getElementById('markBtn').click()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                        </svg>
+                        <span>Mark</span>
+                    </button>
+                    <button class="mobile-action-btn clear" onclick="document.getElementById('clearBtn').click()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <span>Clear</span>
+                    </button>
+                    <button class="mobile-action-btn next primary" id="mobileNextBtn"
+                        onclick="document.getElementById('nextBtn').click()">
+                        <span id="mobileNextText">Next</span>
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nav Overlay for Mobile -->
+            <div class="nav-overlay" id="navOverlay" onclick="closeNavPanel()"></div>
+
+            <div class="nav-panel" id="navPanel">
+                <div class="nav-header">
+                    <h3>Question Palette</h3>
+                </div>
+                <div class="nav-legend">
+                    <div class="nav-legend-item">
+                        <div class="nav-legend-color not-visited"></div>
+                        <span>Not Visited</span>
+                    </div>
+                    <div class="nav-legend-item">
+                        <div class="nav-legend-color not-answered"></div>
+                        <span>Not Answered</span>
+                    </div>
+                    <div class="nav-legend-item">
+                        <div class="nav-legend-color answered"></div>
+                        <span>Answered</span>
+                    </div>
+                    <div class="nav-legend-item">
+                        <div class="nav-legend-color marked"></div>
+                        <span>Marked</span>
+                    </div>
+                </div>
+                <div class="nav-palette">
+                    <div class="palette-grid" id="paletteGrid"></div>
+                </div>
+                <div class="nav-stats">
+                    <div class="stats-row">
+                        <span class="label">Answered</span>
+                        <span class="value" id="statAnswered">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="label">Not Answered</span>
+                        <span class="value" id="statNotAnswered">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="label">Marked</span>
+                        <span class="value" id="statMarked">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="label">Not Visited</span>
+                        <span class="value" id="statNotVisited">0</span>
+                    </div>
+                </div>
+                <div class="nav-submit">
+                    <button class="btn-submit" id="submitBtn">Submit Test</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Modal -->
+    <div class="modal-overlay" id="submitModal">
+        <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
+            <h2>Submit Test?</h2>
+            <p>Are you sure you want to submit? This action cannot be undone.</p>
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <div class="value" id="modalAnswered">0</div>
+                    <div class="label">Answered</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="value" id="modalNotAnswered">0</div>
+                    <div class="label">Skipped</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="value" id="modalMarked">0</div>
+                    <div class="label">Marked</div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelSubmit">Go Back</button>
+                <button class="btn-confirm" id="confirmSubmit">Submit Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Toast Removed -->
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Centralized Firebase Config -->
+    <script src="firebase-config.js"></script>
+
+    <script>
+        // Check authentication - Allow guests to take free tests
+        const currentUser = JSON.parse(localStorage.getItem('nudge_user'));
+        // Guest users can access exam page for free tests
+        // if (!currentUser) window.location.href = 'login.html';
+
+        // Get test config
+        const testConfig = JSON.parse(localStorage.getItem('nudge_current_test')) || {
+            id: 'demo-test',
+            title: 'Demo Mock Test',
+            questions: 30,
+            duration: 30,
+            marks: 120
+        };
+
+        // Check if this is a custom test with embedded questions
+        const isCustomTest = testConfig.id && testConfig.id.startsWith('custom_') && testConfig.questionData;
+
+        // Question bank (used for default tests)
+        const questionBank = {
+            'General Knowledge': [
+                { q: 'Which planet is known as the Red Planet?', options: ['Venus', 'Mars', 'Jupiter', 'Saturn'], correct: 1 },
+                { q: 'What is the capital of Australia?', options: ['Sydney', 'Melbourne', 'Canberra', 'Perth'], correct: 2 },
+                { q: 'Who wrote "Romeo and Juliet"?', options: ['Charles Dickens', 'William Shakespeare', 'Jane Austen', 'Mark Twain'], correct: 1 },
+                { q: 'What is the largest ocean on Earth?', options: ['Atlantic', 'Indian', 'Arctic', 'Pacific'], correct: 3 },
+                { q: 'In which year did World War II end?', options: ['1943', '1944', '1945', '1946'], correct: 2 }
+            ],
+            'Numerical Ability': [
+                { q: 'If 3x + 7 = 22, what is the value of x?', options: ['3', '4', '5', '6'], correct: 2 },
+                { q: 'What is 15% of 200?', options: ['25', '30', '35', '40'], correct: 1 },
+                { q: 'The average of 10, 20, 30, 40, 50 is:', options: ['25', '30', '35', '40'], correct: 1 },
+                { q: 'A train travels 60 km in 1 hour. How far will it travel in 2.5 hours?', options: ['120 km', '140 km', '150 km', '180 km'], correct: 2 },
+                { q: 'What is the LCM of 12 and 18?', options: ['24', '36', '48', '72'], correct: 1 }
+            ],
+            'Logical Reasoning': [
+                { q: 'Find the odd one out: Apple, Banana, Carrot, Orange', options: ['Apple', 'Banana', 'Carrot', 'Orange'], correct: 2 },
+                { q: 'If FRIEND is coded as GSJFOE, how is CANDLE coded?', options: ['DBOEFM', 'DBOEMF', 'DBOELM', 'DBNEFM'], correct: 0 },
+                { q: 'Complete the series: 2, 6, 12, 20, ?', options: ['28', '30', '32', '36'], correct: 1 },
+                { q: 'If all Bloops are Razzies and all Razzies are Lazzies, then all Bloops are definitely Lazzies. True or False?', options: ['True', 'False', 'Cannot be determined', 'Partially true'], correct: 0 },
+                { q: 'A is B\'s brother. C is B\'s mother. D is C\'s father. How is B related to D?', options: ['Grandson', 'Granddaughter', 'Grandchild', 'Cannot be determined'], correct: 2 }
+            ],
+            'Reading Comprehension': [
+                { q: 'What is the primary purpose of a thesis statement in an essay?', options: ['To summarize', 'To state main argument', 'To provide evidence', 'To conclude'], correct: 1 },
+                { q: 'Which literary device involves giving human qualities to non-human things?', options: ['Metaphor', 'Simile', 'Personification', 'Hyperbole'], correct: 2 },
+                { q: 'What type of text is primarily meant to persuade the reader?', options: ['Narrative', 'Descriptive', 'Expository', 'Argumentative'], correct: 3 },
+                { q: 'An antonym is a word that means:', options: ['The same as another word', 'The opposite of another word', 'Sounds like another word', 'Is spelled like another word'], correct: 1 },
+                { q: 'What is the main idea of a passage typically found in?', options: ['Conclusion only', 'Introduction only', 'Topic sentences', 'Supporting details'], correct: 2 }
+            ],
+            'Grammar': [
+                { q: 'Choose the correct form: She ___ to the store yesterday.', options: ['go', 'goes', 'went', 'going'], correct: 2 },
+                { q: 'Identify the error: "Me and him went to the movie."', options: ['Me should be I', 'Him should be he', 'Both A and B', 'No error'], correct: 2 },
+                { q: 'Which sentence uses the comma correctly?', options: ['The dog, ran fast.', 'After dinner, we watched a movie.', 'She is smart, and pretty.', 'I like, pizza.'], correct: 1 },
+                { q: 'What is the plural of "phenomenon"?', options: ['Phenomenons', 'Phenomena', 'Phenomeni', 'Phenomenae'], correct: 1 },
+                { q: 'Choose the correct pronoun: Everyone must bring ___ own lunch.', options: ['their', 'his or her', 'its', 'there'], correct: 1 }
+            ],
+            'Vocabulary': [
+                { q: 'What does "ubiquitous" mean?', options: ['Rare', 'Present everywhere', 'Unknown', 'Dangerous'], correct: 1 },
+                { q: 'A "paradox" is:', options: ['A pair of dice', 'A seemingly contradictory statement', 'A type of poem', 'A mathematical concept'], correct: 1 },
+                { q: 'What is a synonym for "ephemeral"?', options: ['Eternal', 'Short-lived', 'Important', 'Beautiful'], correct: 1 },
+                { q: '"Pragmatic" describes someone who is:', options: ['Idealistic', 'Practical', 'Pessimistic', 'Romantic'], correct: 1 },
+                { q: 'What does "benevolent" mean?', options: ['Evil', 'Neutral', 'Kind and generous', 'Strict'], correct: 2 }
+            ],
+            'Microeconomics': [
+                { q: 'What does the law of demand state?', options: ['Price up, demand up', 'Price down, demand down', 'Price up, demand down', 'No relationship'], correct: 2 },
+                { q: 'What is opportunity cost?', options: ['The cost of production', 'The next best alternative forgone', 'The total cost', 'The fixed cost'], correct: 1 },
+                { q: 'In a perfectly competitive market, firms are:', options: ['Price makers', 'Price takers', 'Monopolists', 'Oligopolists'], correct: 1 },
+                { q: 'What causes a movement along a demand curve?', options: ['Change in income', 'Change in taste', 'Change in price', 'Change in technology'], correct: 2 },
+                { q: 'Consumer surplus is the difference between:', options: ['Price and cost', 'Willingness to pay and actual price', 'Supply and demand', 'Revenue and cost'], correct: 1 }
+            ],
+            'Macroeconomics': [
+                { q: 'GDP stands for:', options: ['General Domestic Product', 'Gross Domestic Product', 'Government Domestic Policy', 'Gross Domestic Policy'], correct: 1 },
+                { q: 'Inflation is measured by:', options: ['GDP', 'CPI', 'GNP', 'NNP'], correct: 1 },
+                { q: 'Fiscal policy involves:', options: ['Interest rates', 'Money supply', 'Government spending and taxation', 'Exchange rates'], correct: 2 },
+                { q: 'What is full employment?', options: ['0% unemployment', 'Natural rate of unemployment', '100% employment', 'None of the above'], correct: 1 },
+                { q: 'The Reserve Bank of India controls:', options: ['Fiscal policy', 'Monetary policy', 'Trade policy', 'Industrial policy'], correct: 1 }
+            ],
+            'Indian Economy': [
+                { q: 'Which sector contributes most to India\'s GDP?', options: ['Agriculture', 'Industry', 'Services', 'Mining'], correct: 2 },
+                { q: 'What is the current Five Year Plan number in India?', options: ['12th', '13th', 'Discontinued', '14th'], correct: 2 },
+                { q: 'NITI Aayog replaced which body?', options: ['Finance Commission', 'Planning Commission', 'RBI', 'SEBI'], correct: 1 },
+                { q: 'GST was implemented in India in which year?', options: ['2015', '2016', '2017', '2018'], correct: 2 },
+                { q: 'What is India\'s rank in terms of population?', options: ['First', 'Second', 'Third', 'Fourth'], correct: 0 }
+            ],
+            'Indian Constitution': [
+                { q: 'How many articles are in the Indian Constitution originally?', options: ['395', '400', '450', '370'], correct: 0 },
+                { q: 'The Preamble declares India as a:', options: ['Federal Republic', 'Sovereign Socialist Secular Democratic Republic', 'Democratic Republic', 'Parliamentary Republic'], correct: 1 },
+                { q: 'Fundamental Rights are contained in which part?', options: ['Part II', 'Part III', 'Part IV', 'Part V'], correct: 1 },
+                { q: 'Who is the guardian of Fundamental Rights?', options: ['President', 'Parliament', 'Supreme Court', 'Prime Minister'], correct: 2 },
+                { q: 'Which article deals with Right to Equality?', options: ['Article 14', 'Article 19', 'Article 21', 'Article 32'], correct: 0 }
+            ],
+            'Political Theory': [
+                { q: 'Who wrote "The Social Contract"?', options: ['John Locke', 'Jean-Jacques Rousseau', 'Thomas Hobbes', 'Montesquieu'], correct: 1 },
+                { q: 'The concept of "General Will" was given by:', options: ['Marx', 'Rousseau', 'Locke', 'Mill'], correct: 1 },
+                { q: 'Liberalism emphasizes:', options: ['State control', 'Individual freedom', 'Collective ownership', 'Monarchy'], correct: 1 },
+                { q: 'Who is considered the father of Political Science?', options: ['Plato', 'Aristotle', 'Socrates', 'Machiavelli'], correct: 1 },
+                { q: 'The theory of separation of powers was given by:', options: ['Locke', 'Rousseau', 'Montesquieu', 'Hobbes'], correct: 2 }
+            ],
+            'International Relations': [
+                { q: 'The United Nations was established in:', options: ['1944', '1945', '1946', '1947'], correct: 1 },
+                { q: 'How many permanent members are in the UN Security Council?', options: ['3', '4', '5', '6'], correct: 2 },
+                { q: 'NAM stands for:', options: ['North American Movement', 'Non-Aligned Movement', 'National Allied Movement', 'New Asian Movement'], correct: 1 },
+                { q: 'The Cold War was between:', options: ['USA and China', 'USA and USSR', 'UK and France', 'Germany and Russia'], correct: 1 },
+                { q: 'WHO is headquartered in:', options: ['New York', 'Paris', 'Geneva', 'London'], correct: 2 }
+            ],
+            'Ancient History': [
+                { q: 'The Indus Valley Civilization flourished around:', options: ['1500 BCE', '2500 BCE', '500 BCE', '3500 BCE'], correct: 1 },
+                { q: 'Ashoka belonged to which dynasty?', options: ['Gupta', 'Maurya', 'Chola', 'Mughal'], correct: 1 },
+                { q: 'The Vedas are written in:', options: ['Pali', 'Sanskrit', 'Prakrit', 'Tamil'], correct: 1 },
+                { q: 'Who founded the Mauryan Empire?', options: ['Ashoka', 'Bindusara', 'Chandragupta Maurya', 'Chanakya'], correct: 2 },
+                { q: 'The ancient university of Nalanda was located in:', options: ['Uttar Pradesh', 'Bihar', 'West Bengal', 'Odisha'], correct: 1 }
+            ],
+            'Medieval History': [
+                { q: 'The Delhi Sultanate was established in:', options: ['1106', '1206', '1306', '1406'], correct: 1 },
+                { q: 'Akbar ruled from:', options: ['1526-1530', '1556-1605', '1605-1627', '1628-1658'], correct: 1 },
+                { q: 'The Bhakti movement emphasized:', options: ['Rituals', 'Devotion to God', 'Caste system', 'Violence'], correct: 1 },
+                { q: 'Vijayanagara Empire was founded by:', options: ['Krishna Deva Raya', 'Harihara and Bukka', 'Shivaji', 'Prithviraj'], correct: 1 },
+                { q: 'The Mughal Empire was founded by:', options: ['Akbar', 'Babur', 'Humayun', 'Shah Jahan'], correct: 1 }
+            ],
+            'Modern India': [
+                { q: 'The First War of Independence occurred in:', options: ['1847', '1857', '1867', '1877'], correct: 1 },
+                { q: 'Who founded the Indian National Congress?', options: ['Gandhi', 'A.O. Hume', 'Nehru', 'Tilak'], correct: 1 },
+                { q: 'The Quit India Movement was launched in:', options: ['1940', '1941', '1942', '1943'], correct: 2 },
+                { q: 'India gained independence on:', options: ['August 15, 1946', 'August 15, 1947', 'January 26, 1947', 'January 26, 1950'], correct: 1 },
+                { q: 'Who was the first Prime Minister of India?', options: ['Sardar Patel', 'Jawaharlal Nehru', 'Rajendra Prasad', 'B.R. Ambedkar'], correct: 1 }
+            ],
+            'Algebra': [
+                { q: 'What is the solution of 2x + 5 = 15?', options: ['x = 4', 'x = 5', 'x = 6', 'x = 7'], correct: 1 },
+                { q: 'Factorize: x² - 9', options: ['(x-3)(x+3)', '(x-9)(x+1)', '(x-3)²', '(x+3)²'], correct: 0 },
+                { q: 'What is the value of (a+b)² when a=2, b=3?', options: ['20', '25', '30', '35'], correct: 1 },
+                { q: 'Solve: 3(x-2) = 12', options: ['x = 4', 'x = 5', 'x = 6', 'x = 7'], correct: 2 },
+                { q: 'What is the discriminant of x² + 4x + 4 = 0?', options: ['0', '4', '8', '16'], correct: 0 }
+            ],
+            'Calculus': [
+                { q: 'What is the derivative of x²?', options: ['x', '2x', '2x²', 'x²'], correct: 1 },
+                { q: 'The integral of 2x is:', options: ['x²', 'x² + C', '2x²', '2x² + C'], correct: 1 },
+                { q: 'What is d/dx(sin x)?', options: ['cos x', '-cos x', 'sin x', '-sin x'], correct: 0 },
+                { q: 'The derivative of a constant is:', options: ['1', '0', 'The constant', 'Undefined'], correct: 1 },
+                { q: 'What is ∫1/x dx?', options: ['x', 'ln|x| + C', '1/x²', 'e^x'], correct: 1 }
+            ],
+            'Probability': [
+                { q: 'The probability of getting heads in a fair coin toss is:', options: ['0', '0.25', '0.5', '1'], correct: 2 },
+                { q: 'If P(A) = 0.3 and P(B) = 0.4, and A and B are independent, P(A∩B) is:', options: ['0.12', '0.7', '0.1', '0.3'], correct: 0 },
+                { q: 'The sum of all probabilities in a sample space equals:', options: ['0', '0.5', '1', '2'], correct: 2 },
+                { q: 'A die is rolled. P(even number) is:', options: ['1/6', '1/3', '1/2', '2/3'], correct: 2 },
+                { q: 'If P(A) = 0.6, then P(A\') is:', options: ['0.6', '0.4', '0.3', '1'], correct: 1 }
+            ]
+        };
+
+        // Generate questions
+        let questions = [];
+
+        if (isCustomTest && testConfig.questionData && testConfig.questionData.length > 0) {
+            // Load questions from custom test
+            questions = testConfig.questionData.map((q, i) => ({
+                id: q.id || `custom-${i}`,
+                subject: testConfig.subjects?.[0] || 'Custom',
+                question: q.question,
+                options: q.options,
+                correct: q.correct,
+                solution: q.solution || '',
+                status: 'not-visited',
+                answer: null,
+                marked: false
+            }));
+        } else if (testConfig.questionData && testConfig.questionData.length > 0) {
+            // Non-custom test with questionData
+            questions = testConfig.questionData.map((q, i) => ({
+                id: q.id || `q-${i}`,
+                subject: testConfig.subjects?.[0] || 'General',
+                question: q.question,
+                options: q.options,
+                correct: q.correct,
+                solution: q.solution || '',
+                status: 'not-visited',
+                answer: null,
+                marked: false
+            }));
+        } else {
+            // No questions available - show error and redirect
+            alert('This test has no questions available. Please contact the administrator.');
+            window.location.href = 'login.html';
+        }
+
+        // Validate we have questions
+        if (questions.length === 0) {
+            alert('This test has no questions available. Please contact the administrator.');
+            window.location.href = 'login.html';
+        }
+
+        // State
+        let currentIndex = 0;
+        let timeRemaining = testConfig.duration * 60;
+        let timerInterval = null;
+        // let tabSwitchCount = 0; // Removed
+        let startTime = null;
+
+        // Initialize UI
+        document.getElementById('testTitle').textContent = testConfig.title;
+        document.getElementById('infoQuestions').textContent = testConfig.questions;
+        document.getElementById('infoDuration').textContent = testConfig.duration;
+        document.getElementById('infoMarks').textContent = testConfig.marks;
+        document.getElementById('examTitle').textContent = testConfig.title;
+        document.getElementById('totalQNum').textContent = testConfig.questions;
+        document.getElementById('examUserAvatar').textContent = (currentUser?.name || 'G').charAt(0).toUpperCase();
+
+        // Update Marks UI
+        const uiMarksPerQ = parseFloat(testConfig.marksPerQuestion) || 4;
+        const uiNegMarks = parseFloat(testConfig.negativeMarks) || 1;
+        document.getElementById('infoPositiveMarks').textContent = `+${uiMarksPerQ} marks`;
+        document.getElementById('infoNegativeMarks').textContent = `-${uiNegMarks} wrong`;
+
+        // Agreement checkbox
+        document.getElementById('agreeCheckbox').addEventListener('change', (e) => {
+            document.getElementById('startTestBtn').disabled = !e.target.checked;
+        });
+
+        // Start test
+        document.getElementById('startTestBtn').addEventListener('click', () => {
+            document.getElementById('instructionsOverlay').classList.add('hidden');
+            document.getElementById('examContainer').classList.add('active');
+            startTime = Date.now();
+            startTimer();
+            renderQuestion();
+            renderPalette();
+            updateStats();
+
+            // Request fullscreen
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => { });
+            }
+        });
+
+        // Timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest(true);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeRemaining / 60);
+            const secs = timeRemaining % 60;
+            const display = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = display;
+
+            const timer = document.getElementById('examTimer');
+            timer.classList.remove('warning', 'danger');
+            if (timeRemaining <= 120) timer.classList.add('danger');
+            else if (timeRemaining <= 600) timer.classList.add('warning');
+        }
+
+        // Render question
+        function renderQuestion() {
+            const q = questions[currentIndex];
+            if (q.status === 'not-visited') q.status = 'not-answered';
+
+            document.getElementById('currentQNum').textContent = currentIndex + 1;
+            document.getElementById('questionText').innerHTML = q.question;
+
+            const optionsList = document.getElementById('optionsList');
+            const letters = ['A', 'B', 'C', 'D'];
+            optionsList.innerHTML = q.options.map((opt, i) => `
+                <div class="option-item ${q.answer === i ? 'selected' : ''}" onclick="selectOption(${i})">
+                    <div class="option-letter">${letters[i]}</div>
+                    <div class="option-text">${opt}</div>
+                </div>
+            `).join('');
+
+            const markBtn = document.getElementById('markBtn');
+            markBtn.classList.toggle('marked', q.marked);
+            markBtn.textContent = q.marked ? '★ Marked' : 'Mark for Review';
+
+            // Navigation Button Logic
+            const nextBtn = document.getElementById('nextBtn');
+            const mobileNextText = document.getElementById('mobileNextText');
+
+            if (currentIndex === questions.length - 1) {
+                // Last question: Change to Submit
+                nextBtn.textContent = 'Submit Test';
+                nextBtn.disabled = false; // Ensure enabled
+                if (mobileNextText) mobileNextText.textContent = 'Submit';
+                // Optional: Change mobile icon or style for submit if needed
+            } else {
+                nextBtn.textContent = 'Save & Next';
+                nextBtn.disabled = false;
+                if (mobileNextText) mobileNextText.textContent = 'Next';
+            }
+
+            // Previous button logic
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+
+            renderPalette();
+            updateStats();
+        }
+
+        // Select option
+        function selectOption(index) {
+            questions[currentIndex].answer = index;
+            questions[currentIndex].status = 'answered';
+            renderQuestion();
+        }
+
+        // Clear response
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            questions[currentIndex].answer = null;
+            questions[currentIndex].status = 'not-answered';
+            renderQuestion();
+        });
+
+        // Mark for review
+        document.getElementById('markBtn').addEventListener('click', () => {
+            questions[currentIndex].marked = !questions[currentIndex].marked;
+            if (questions[currentIndex].marked && questions[currentIndex].status !== 'answered') {
+                questions[currentIndex].status = 'marked';
+            }
+            renderQuestion();
+        });
+
+        // Navigation
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentIndex > 0) { currentIndex--; renderQuestion(); }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentIndex === questions.length - 1) {
+                // Last Question -> Submit Logic
+                document.getElementById('submitBtn').click(); // Trigger the submit modal
+            } else {
+                currentIndex++;
+                renderQuestion();
+            }
+        });
+
+        // Palette
+        function renderPalette() {
+            const grid = document.getElementById('paletteGrid');
+            grid.innerHTML = questions.map((q, i) => {
+                let cls = q.status;
+                if (q.marked && q.answer !== null) cls = 'marked-answered';
+                else if (q.marked) cls = 'marked';
+                return `<button class="palette-btn ${cls} ${i === currentIndex ? 'current' : ''}" onclick="goToQuestion(${i})">${i + 1}</button>`;
+            }).join('');
+        }
+
+        function goToQuestion(index) {
+            currentIndex = index;
+            renderQuestion();
+        }
+
+        // Stats
+        function updateStats() {
+            const answered = questions.filter(q => q.answer !== null).length;
+            const notAnswered = questions.filter(q => q.status === 'not-answered').length;
+            const marked = questions.filter(q => q.marked).length;
+            const notVisited = questions.filter(q => q.status === 'not-visited').length;
+
+            document.getElementById('statAnswered').textContent = answered;
+            document.getElementById('statNotAnswered').textContent = notAnswered;
+            document.getElementById('statMarked').textContent = marked;
+            document.getElementById('statNotVisited').textContent = notVisited;
+        }
+
+        // Submit modal
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const answered = questions.filter(q => q.answer !== null).length;
+            const notAnswered = questions.length - answered;
+            const marked = questions.filter(q => q.marked).length;
+
+            document.getElementById('modalAnswered').textContent = answered;
+            document.getElementById('modalNotAnswered').textContent = notAnswered;
+            document.getElementById('modalMarked').textContent = marked;
+            document.getElementById('submitModal').classList.add('active');
+        });
+
+        document.getElementById('cancelSubmit').addEventListener('click', () => {
+            document.getElementById('submitModal').classList.remove('active');
+        });
+
+        document.getElementById('confirmSubmit').addEventListener('click', () => {
+            submitTest(false);
+        });
+
+        // Submit test
+        function submitTest(autoSubmit) {
+            clearInterval(timerInterval);
+
+            let correct = 0, wrong = 0, skipped = 0, score = 0;
+            const responses = [];
+
+            // Scoring Logic
+            const marksPerQuestion = parseFloat(testConfig.marksPerQuestion) || 4;
+            const negativeMarks = parseFloat(testConfig.negativeMarks) || 1;
+
+            questions.forEach(q => {
+                const response = {
+                    questionId: q.id,
+                    subject: q.subject,
+                    question: q.question,
+                    options: q.options,
+                    correct: q.correct,
+                    userAnswer: q.answer,
+                    isCorrect: q.answer === q.correct
+                };
+                responses.push(response);
+
+                if (q.answer === null) {
+                    skipped++;
+                } else if (q.answer === q.correct) {
+                    correct++;
+                    score += marksPerQuestion;
+                } else {
+                    wrong++;
+                    score -= negativeMarks;
+                }
+            });
+
+            const maxScore = questions.length * marksPerQuestion;
+            const percentage = Math.max(0, (score / maxScore) * 100);
+            const timeTaken = testConfig.duration * 60 - timeRemaining;
+
+            // Handle guest users
+            const isGuest = !currentUser;
+            const guestId = 'guest_' + Date.now();
+
+            const result = {
+                id: Date.now(),
+                userId: currentUser?.uid || guestId,
+                userName: currentUser?.name || currentUser?.email?.split('@')[0] || 'Guest',
+                isGuest: isGuest,
+                testId: testConfig.id,
+                testTitle: testConfig.title,
+                score,
+                maxScore,
+                marksPerQuestion, // Save for result page
+                negativeMarks,    // Save for result page
+                percentage,
+                correct,
+                wrong,
+                skipped,
+                timeTaken,
+                responses,
+                questions: questions.length,
+                date: new Date().toISOString(),
+                autoSubmitted: autoSubmit
+            };
+
+            // Save result
+            (async () => {
+                try {
+                    // Only save to Firebase if user is logged in
+                    if (!isGuest) {
+                        await NudgeDB.saveResult(result);
+                    } else {
+                        // For guests, only save to localStorage
+                        const results = JSON.parse(localStorage.getItem('nudge_results')) || [];
+                        results.push(result);
+                        localStorage.setItem('nudge_results', JSON.stringify(results));
+                    }
+                } catch (e) {
+                    console.error('Error saving to Firebase:', e);
+                    // Fallback to localStorage
+                    const results = JSON.parse(localStorage.getItem('nudge_results')) || [];
+                    results.push(result);
+                    localStorage.setItem('nudge_results', JSON.stringify(results));
+                }
+                localStorage.setItem('nudge_last_result', JSON.stringify(result));
+
+                // Redirect to result page
+                window.location.href = 'result.html';
+            })();
+        }
+
+        // Anti-cheat: Tab switch detection removed by user request
+
+        // Prevent right-click
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('examContainer').classList.contains('active')) return;
+
+            if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            } else if (e.key === 'ArrowRight' && currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            }
+        });
+
+        // Mobile Nav Toggle with Overlay Support
+        const navPanel = document.getElementById('navPanel');
+        const navOverlay = document.getElementById('navOverlay');
+        const mobileNavToggle = document.getElementById('mobileNavToggle');
+
+        function openNavPanel() {
+            navPanel?.classList.add('open');
+            navOverlay?.classList.add('active');
+        }
+
+        function closeNavPanel() {
+            navPanel?.classList.remove('open');
+            navOverlay?.classList.remove('active');
+        }
+
+        mobileNavToggle?.addEventListener('click', () => {
+            if (navPanel?.classList.contains('open')) {
+                closeNavPanel();
+            } else {
+                openNavPanel();
+            }
+        });
+
+        // Close panel when clicking a palette button on mobile
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('palette-btn')) {
+                if (window.innerWidth <= 768) {
+                    closeNavPanel();
+                }
+            }
+        });
+
+        // Initialize first question
+        renderQuestion();
+        renderPalette();
+    </script>
+</body>
+
+</html>

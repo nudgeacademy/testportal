@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Admin Login | Nudge Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            --primary-bg: #fef2f2;
+            --dark: #0f172a;
+            --dark-800: #1e293b;
+            --gray-500: #64748b;
+            --gray-400: #94a3b8;
+            --gray-200: #e2e8f0;
+            --gray-100: #f1f5f9;
+            --white: #ffffff;
+            --font: 'Plus Jakarta Sans', sans-serif;
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-800) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--white);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 25px 80px -20px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .logo img {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--primary-bg);
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 50px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: var(--font);
+            color: var(--dark);
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: var(--gray-400);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px 24px;
+            background: var(--primary);
+            color: var(--white);
+            font-family: var(--font);
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 10px 40px -10px rgba(220, 38, 38, 0.4);
+            margin-top: 8px;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-login:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-message {
+            background: var(--primary-bg);
+            color: var(--primary);
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 24px;
+            color: var(--gray-500);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .demo-hint {
+            margin-top: 24px;
+            padding: 16px;
+            background: var(--gray-100);
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            color: var(--gray-500);
+        }
+
+        .demo-hint strong {
+            color: var(--dark);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+
+            .login-container {
+                padding: 32px 24px;
+                border-radius: 20px;
+            }
+
+            .logo img {
+                width: 48px;
+                height: 48px;
+            }
+
+            .logo-text {
+                font-size: 1.25rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-group input {
+                font-size: 16px;
+                /* Prevents auto-zoom on iOS */
+                padding: 12px 14px;
+                min-height: 48px;
+            }
+
+            .btn-login {
+                min-height: 52px;
+                font-size: 0.95rem;
+            }
+
+            .demo-hint {
+                padding: 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <img src="NUDGE_LOGO.png" alt="Nudge Academy">
+            <span class="logo-text">Nudge <span>Academy</span></span>
+        </div>
+
+        <div class="header">
+            <span class="admin-badge">🔐 Admin Access</span>
+            <h1>Admin Login</h1>
+            <p>Sign in to manage tests and content</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="admin@nudge.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">
+                Sign In to Admin Panel
+            </button>
+        </form>
+
+        <a href="login.html" class="back-link">← Back to Main Site</a>
+
+        <div class="demo-hint" id="demoHint" style="display: none;">
+            <strong>Demo Mode Active</strong><br>
+            Use: admin@nudge.com / admin123
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script>
+        // Show demo hint if in demo mode
+        if (typeof isDemoMode !== 'undefined' && isDemoMode) {
+            document.getElementById('demoHint').style.display = 'block';
+        }
+
+        // Check if already logged in
+        const existingAdmin = localStorage.getItem('nudge_admin');
+        if (existingAdmin) {
+            window.location.href = 'admin.html';
+        }
+
+        // Handle login form
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('errorMessage');
+
+            // Reset error
+            errorDiv.classList.remove('show');
+            errorDiv.textContent = '';
+
+            // Disable button
+            btn.disabled = true;
+            btn.textContent = 'Signing in...';
+
+            try {
+                console.log('🔐 Attempting admin login for:', email);
+
+                // Use NudgeDB.verifyAdmin to authenticate
+                const admin = await NudgeDB.verifyAdmin(email, password);
+
+                if (admin) {
+                    console.log('✅ Admin verified:', admin.email);
+
+                    // Save to localStorage
+                    localStorage.setItem('nudge_admin', JSON.stringify(admin));
+
+                    // Redirect to admin panel
+                    window.location.href = 'admin.html';
+                } else {
+                    throw new Error('Invalid admin credentials. Please try again.');
+                }
+            } catch (error) {
+                console.error('❌ Login error:', error);
+
+                let message = error.message || 'Login failed. Please try again.';
+
+                // Handle specific Firebase errors
+                if (error.code === 'auth/user-not-found') {
+                    message = 'No account found with this email.';
+                } else if (error.code === 'auth/wrong-password') {
+                    message = 'Incorrect password. Please try again.';
+                } else if (error.code === 'auth/invalid-email') {
+                    message = 'Please enter a valid email address.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    message = 'Too many failed attempts. Please try again later.';
+                }
+
+                errorDiv.textContent = message;
+                errorDiv.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sign In to Admin Panel';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#dc2626">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Result | Nudge Academy Mock Tests</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            --primary-bg: #fef2f2;
+            --dark: #0f172a;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--gray-100);
+            min-height: 100vh;
+        }
+
+        .result-header {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 0;
+            position: relative;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header-top-bar {
+            background: #dc2626;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .header-top-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .header-top-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-brand img {
+            height: 32px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .header-brand-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.9;
+            color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .header-main {
+            padding: 1.5rem 0 1.75rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .header-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #16a34a;
+            background: #dcfce7;
+            padding: 0.375rem 0.875rem;
+            border-radius: 100px;
+            width: fit-content;
+        }
+
+        .header-eyebrow svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .header-left h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            color: #0f172a;
+        }
+
+        .header-left p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: #dc2626;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-back:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.25);
+        }
+
+        .btn-back svg {
+            transition: transform 0.25s ease;
+        }
+
+        .btn-back:hover svg {
+            transform: translateX(-3px);
+        }
+
+        .btn-print {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-print:hover {
+            background: white;
+            color: #dc2626;
+            border-color: white;
+        }
+
+        .result-content {
+            padding: 2rem 0 4rem;
+        }
+
+        /* Score Card */
+        .score-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .score-circle-container {
+            flex-shrink: 0;
+        }
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            position: relative;
+        }
+
+        .score-circle svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .score-circle .bg {
+            fill: none;
+            stroke: #f1f5f9;
+            stroke-width: 12;
+        }
+
+        .score-circle .progress {
+            fill: none;
+            stroke: #dc2626;
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 502;
+            stroke-dashoffset: 502;
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+
+        .score-circle .progress.high {
+            stroke: #22c55e;
+        }
+
+        .score-circle .progress.medium {
+            stroke: #f59e0b;
+        }
+
+        .score-circle .progress.low {
+            stroke: #dc2626;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-percentage {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .score-details {
+            flex: 1;
+        }
+
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .score-title p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .grade-badge {
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .grade-badge.A {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .grade-badge.B {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .grade-badge.C {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .grade-badge.D {
+            background: #fed7aa;
+            color: #ea580c;
+        }
+
+        .grade-badge.F {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-item .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .stat-item .label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .stat-item.correct .value {
+            color: #22c55e;
+        }
+
+        .stat-item.wrong .value {
+            color: #dc2626;
+        }
+
+        .stat-item.skipped .value {
+            color: #f59e0b;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: #0f172a;
+        }
+
+        .tab-btn.active {
+            color: #dc2626;
+            border-bottom-color: #dc2626;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Overview Tab */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .overview-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .overview-card h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 0.75rem;
+        }
+
+        .overview-card .value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 100px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 1s ease;
+        }
+
+        .progress-fill.green {
+            background: #22c55e;
+        }
+
+        .progress-fill.red {
+            background: #dc2626;
+        }
+
+        .progress-fill.yellow {
+            background: #f59e0b;
+        }
+
+        .subject-performance {
+            margin-top: 1.5rem;
+        }
+
+        .subject-performance h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 1rem;
+        }
+
+        .subject-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .subject-item:last-child {
+            border-bottom: none;
+        }
+
+        .subject-name {
+            width: 150px;
+            font-weight: 500;
+            color: #0f172a;
+            font-size: 0.9rem;
+        }
+
+        .subject-bar {
+            flex: 1;
+            height: 24px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .subject-fill {
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            transition: width 1s ease;
+        }
+
+        .subject-fill.high {
+            background: #22c55e;
+        }
+
+        .subject-fill.medium {
+            background: #f59e0b;
+        }
+
+        .subject-fill.low {
+            background: #dc2626;
+        }
+
+        /* Solutions Tab */
+        .solutions-filter {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 100px;
+            background: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #dc2626;
+        }
+
+        .filter-btn.active {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: white;
+        }
+
+        .solution-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .solution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .solution-number {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .solution-subject {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.75rem;
+            background: #e2e8f0;
+            border-radius: 100px;
+            color: #475569;
+        }
+
+        .solution-status {
+            padding: 0.375rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .solution-status.correct {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .solution-status.wrong {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .solution-status.skipped {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .solution-question {
+            font-size: 1rem;
+            color: #1e293b;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+        }
+
+        .solution-question table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .solution-question th,
+        .solution-question td {
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .solution-question th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+
+        .solution-question img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .solution-question ul,
+        .solution-question ol {
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .solution-question p {
+            margin-bottom: 0.5rem;
+        }
+
+        .solution-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .solution-option {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .solution-option.correct-answer {
+            background: #dcfce7;
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        .solution-option.user-wrong {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .solution-option .letter {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Analysis Tab */
+        .leaderboard {
+            margin-top: 1.5rem;
+        }
+
+        .leaderboard h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 1rem;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .leaderboard-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .leaderboard-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .leaderboard-table tr.current-user {
+            background: #fef2f2;
+            font-weight: 600;
+        }
+
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .rank-badge.gold {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .rank-badge.silver {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .rank-badge.bronze {
+            background: #fed7aa;
+            color: #c2410c;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            animation: confetti-fall 3s ease-in-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(-100px) rotate(0deg);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        @media print {
+
+            .result-header,
+            .header-top-bar,
+            .header-main,
+            .tabs-header,
+            .btn-back,
+            .btn-print {
+                display: none;
+            }
+
+            .score-card,
+            .tabs-container {
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .score-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .solution-options {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1.25rem;
+                align-items: flex-start;
+            }
+
+            .header-main {
+                padding: 1.5rem 0 2rem;
+            }
+
+            .header-left h1 {
+                font-size: 1.5rem;
+            }
+
+            .header-right {
+                width: 100%;
+            }
+
+            .btn-back {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-top-content {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .score-header {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .tabs-container {
+                border-radius: 16px;
+            }
+
+            .tabs-header {
+                overflow-x: auto;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 4px;
+            }
+
+            .tab-btn {
+                flex: none;
+                padding: 1rem 1.5rem;
+                white-space: nowrap;
+            }
+
+            /* Filter buttons scrollable */
+            .solutions-filter {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                flex-wrap: nowrap;
+                padding-bottom: 8px;
+            }
+
+            .filter-btn {
+                white-space: nowrap;
+                flex-shrink: 0;
+                padding: 8px 14px;
+            }
+
+            /* Solution items */
+            .solution-header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .solution-item {
+                padding: 1rem;
+            }
+
+            .solution-text {
+                font-size: 0.95rem;
+            }
+
+            /* Subject performance */
+            .subject-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .subject-name {
+                width: 100%;
+            }
+
+            .subject-bar {
+                width: 100%;
+            }
+
+            .score-card {
+                padding: 1.5rem;
+            }
+
+            .score-circle {
+                width: 140px;
+                height: 140px;
+            }
+
+            .score-percentage {
+                font-size: 1.75rem;
+            }
+
+            .grade-badge {
+                font-size: 1rem;
+                padding: 0.375rem 1rem;
+            }
+
+            .stats-grid {
+                gap: 0.75rem;
+            }
+
+            .stat-item .value {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+
+            .header-top-bar {
+                padding: 10px 0;
+            }
+
+            .header-brand img {
+                height: 28px;
+            }
+
+            .btn-print {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .header-left h1 {
+                font-size: 1.3rem;
+            }
+
+            .btn-back {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+
+            .score-card {
+                padding: 1.25rem;
+            }
+
+            .score-circle {
+                width: 120px;
+                height: 120px;
+            }
+
+            .score-percentage {
+                font-size: 1.5rem;
+            }
+
+            .score-label {
+                font-size: 0.75rem;
+            }
+
+            .score-title h2 {
+                font-size: 1.1rem;
+            }
+
+            .score-title p {
+                font-size: 0.85rem;
+            }
+
+            .grade-badge {
+                font-size: 0.9rem;
+                padding: 0.25rem 0.875rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            .stat-item {
+                padding: 0.75rem;
+            }
+
+            .stat-item .value {
+                font-size: 1.25rem;
+            }
+
+            .stat-item .label {
+                font-size: 0.7rem;
+            }
+
+            .tab-btn {
+                padding: 0.875rem 1.25rem;
+                font-size: 0.85rem;
+            }
+
+            .tab-content {
+                padding: 1rem;
+            }
+
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .solution-text {
+                font-size: 0.9rem;
+            }
+
+            .solution-option {
+                padding: 0.75rem;
+            }
+
+            .result-content {
+                padding: 1.5rem 0 3rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header-left h1 {
+                font-size: 1.2rem;
+            }
+
+            .score-circle {
+                width: 110px;
+                height: 110px;
+            }
+
+            .score-percentage {
+                font-size: 1.35rem;
+            }
+
+            .score-title h2 {
+                font-size: 1rem;
+            }
+
+            .grade-badge {
+                font-size: 0.85rem;
+            }
+
+            .stat-item .value {
+                font-size: 1.1rem;
+            }
+
+            .tabs-header {
+                gap: 0;
+            }
+
+            .tab-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="result-header">
+        <div class="header-top-bar">
+            <div class="container">
+                <div class="header-top-content">
+                    <div class="header-brand">
+                        <img src="NUDGE_LOGO.png" alt="Nudge Academy">
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-print" onclick="window.print()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                                </path>
+                            </svg>
+                            Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="container">
+                <div class="header-content">
+                    <div class="header-left">
+                        <div class="header-eyebrow">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Test Completed
+                        </div>
+                        <h1>Test Result</h1>
+                        <p id="testName">CUET Mock Test</p>
+                    </div>
+                    <div class="header-right">
+                        <a href="index.html" class="btn-back">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="result-content">
+        <div class="container">
+            <!-- Score Card -->
+            <div class="score-card">
+                <div class="score-circle-container">
+                    <div class="score-circle">
+                        <svg viewBox="0 0 180 180">
+                            <circle class="bg" cx="90" cy="90" r="80"></circle>
+                            <circle class="progress" id="scoreProgress" cx="90" cy="90" r="80"></circle>
+                        </svg>
+                        <div class="score-text">
+                            <div class="score-percentage" id="scorePercentage">0%</div>
+                            <div class="score-label">Score</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-details">
+                    <div class="score-header">
+                        <div class="score-title">
+                            <h2 id="resultTitle">Great Performance!</h2>
+                            <p id="resultSubtitle">You scored better than 75% of test takers</p>
+                        </div>
+                        <div class="grade-badge" id="gradeBadge">A</div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item correct">
+                            <div class="value" id="statCorrect">0</div>
+                            <div class="label">Correct</div>
+                        </div>
+                        <div class="stat-item wrong">
+                            <div class="value" id="statWrong">0</div>
+                            <div class="label">Wrong</div>
+                        </div>
+                        <div class="stat-item skipped">
+                            <div class="value" id="statSkipped">0</div>
+                            <div class="label">Skipped</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" id="statTime">0m</div>
+                            <div class="label">Time Taken</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-tab="overview">Overview</button>
+                    <button class="tab-btn" data-tab="solutions">Solutions</button>
+                    <button class="tab-btn" data-tab="analysis">Analysis</button>
+                </div>
+
+                <!-- Overview Tab -->
+                <div class="tab-content active" id="overview">
+                    <div class="overview-grid">
+                        <div class="overview-card">
+                            <h4>Accuracy</h4>
+                            <div class="value" id="accuracy">0%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill green" id="accuracyBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="overview-card">
+                            <h4>Marks Obtained</h4>
+                            <div class="value"><span id="marksObtained">0</span> / <span id="maxMarks">0</span></div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="marksBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="overview-card">
+                            <h4>Marks Gained</h4>
+                            <div class="value" style="color: #22c55e;">+<span id="marksGained">0</span></div>
+                        </div>
+                        <div class="overview-card">
+                            <h4>Marks Lost</h4>
+                            <div class="value" style="color: #dc2626;">-<span id="marksLost">0</span></div>
+                        </div>
+                    </div>
+                    <div class="subject-performance">
+                        <h4>Subject-wise Performance</h4>
+                        <div id="subjectPerformance"></div>
+                    </div>
+                </div>
+
+                <!-- Solutions Tab -->
+                <div class="tab-content" id="solutions">
+                    <div class="solutions-filter">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="correct">Correct</button>
+                        <button class="filter-btn" data-filter="wrong">Wrong</button>
+                        <button class="filter-btn" data-filter="skipped">Skipped</button>
+                    </div>
+                    <div id="solutionsList"></div>
+                </div>
+
+                <!-- Analysis Tab -->
+                <div class="tab-content" id="analysis">
+                    <div class="overview-grid">
+                        <div class="overview-card">
+                            <h4>Your Rank</h4>
+                            <div class="value" id="userRank">#1</div>
+                        </div>
+                        <div class="overview-card">
+                            <h4>Total Participants</h4>
+                            <div class="value" id="totalParticipants">1</div>
+                        </div>
+                    </div>
+                    <div class="leaderboard">
+                        <h4>Leaderboard</h4>
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Name</th>
+                                    <th>Score</th>
+                                    <th>Accuracy</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Confetti Container -->
+    <div class="confetti" id="confetti"></div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Centralized Firebase Config -->
+    <script src="firebase-config.js"></script>
+
+    <script>
+        // Get result
+        const result = JSON.parse(localStorage.getItem('nudge_last_result'));
+        const currentUser = JSON.parse(localStorage.getItem('nudge_user'));
+
+        if (!result) {
+            window.location.href = 'index.html';
+        }
+
+        // Update UI
+        document.getElementById('testName').textContent = result.testTitle;
+        document.getElementById('scorePercentage').textContent = Math.round(result.percentage) + '%';
+        document.getElementById('statCorrect').textContent = result.correct;
+        document.getElementById('statWrong').textContent = result.wrong;
+        document.getElementById('statSkipped').textContent = result.skipped;
+
+        const mins = Math.floor(result.timeTaken / 60);
+        const secs = result.timeTaken % 60;
+        document.getElementById('statTime').textContent = mins + 'm ' + secs + 's';
+
+        // Score circle animation
+        const progress = document.getElementById('scoreProgress');
+        const circumference = 2 * Math.PI * 80;
+        const offset = circumference - (result.percentage / 100) * circumference;
+
+        setTimeout(() => {
+            progress.style.strokeDashoffset = offset;
+            if (result.percentage >= 70) progress.classList.add('high');
+            else if (result.percentage >= 40) progress.classList.add('medium');
+            else progress.classList.add('low');
+        }, 100);
+
+        // Grade
+        let grade, gradeClass;
+        if (result.percentage >= 90) { grade = 'A+'; gradeClass = 'A'; }
+        else if (result.percentage >= 80) { grade = 'A'; gradeClass = 'A'; }
+        else if (result.percentage >= 70) { grade = 'B+'; gradeClass = 'B'; }
+        else if (result.percentage >= 60) { grade = 'B'; gradeClass = 'B'; }
+        else if (result.percentage >= 50) { grade = 'C'; gradeClass = 'C'; }
+        else if (result.percentage >= 40) { grade = 'D'; gradeClass = 'D'; }
+        else { grade = 'F'; gradeClass = 'F'; }
+
+        document.getElementById('gradeBadge').textContent = grade;
+        document.getElementById('gradeBadge').classList.add(gradeClass);
+
+        // Title based on performance
+        if (result.percentage >= 80) {
+            document.getElementById('resultTitle').textContent = 'Excellent Performance! 🎉';
+            document.getElementById('resultSubtitle').textContent = 'Outstanding work! Keep it up!';
+            showConfetti();
+        } else if (result.percentage >= 60) {
+            document.getElementById('resultTitle').textContent = 'Good Job! 👍';
+            document.getElementById('resultSubtitle').textContent = 'Well done! Room for improvement.';
+        } else if (result.percentage >= 40) {
+            document.getElementById('resultTitle').textContent = 'Keep Practicing! 💪';
+            document.getElementById('resultSubtitle').textContent = 'Review the solutions and try again.';
+        } else {
+            document.getElementById('resultTitle').textContent = 'Don\'t Give Up! 📚';
+            document.getElementById('resultSubtitle').textContent = 'Focus on your weak areas.';
+        }
+
+        // Show guest signup prompt if user is not logged in
+        if (!currentUser || result.isGuest) {
+            const guestBanner = document.createElement('div');
+            guestBanner.style.cssText = `
+                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                border: 2px solid #f59e0b;
+                border-radius: 16px;
+                padding: 20px 24px;
+                margin: 24px auto;
+                max-width: 800px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                flex-wrap: wrap;
+                box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+            `;
+            guestBanner.innerHTML = `
+                <div style="flex:1;min-width:200px;">
+                    <div style="font-weight:700;color:#92400e;font-size:1.1rem;margin-bottom:4px;">🎓 Save Your Progress!</div>
+                    <div style="color:#78350f;font-size:0.9rem;">Create a free account to track your results, compete on leaderboards, and unlock more tests.</div>
+                </div>
+                <a href="login.html" style="
+                    background: #f59e0b;
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 50px;
+                    font-weight: 700;
+                    text-decoration: none;
+                    white-space: nowrap;
+                    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+                    transition: all 0.3s ease;
+                ">Sign Up Free →</a>
+            `;
+            // Insert after the header
+            const resultHeader = document.querySelector('.result-header');
+            if (resultHeader && resultHeader.nextSibling) {
+                resultHeader.parentNode.insertBefore(guestBanner, resultHeader.nextSibling);
+            }
+        }
+
+        // Overview
+        const attempted = result.correct + result.wrong;
+        const accuracy = attempted > 0 ? (result.correct / attempted) * 100 : 0;
+        document.getElementById('accuracy').textContent = Math.round(accuracy) + '%';
+        document.getElementById('accuracyBar').style.width = accuracy + '%';
+
+        document.getElementById('marksObtained').textContent = result.score;
+        document.getElementById('maxMarks').textContent = result.maxScore;
+        const marksPercent = (result.score / result.maxScore) * 100;
+        const marksBar = document.getElementById('marksBar');
+        marksBar.style.width = Math.max(0, marksPercent) + '%';
+        marksBar.classList.add(marksPercent >= 60 ? 'green' : marksPercent >= 40 ? 'yellow' : 'red');
+
+        // Use saved marks config or defaults
+        const marksPerQuestion = result.marksPerQuestion || 4;
+        const negativeMarks = result.negativeMarks || 1;
+
+        document.getElementById('marksGained').textContent = result.correct * marksPerQuestion;
+        document.getElementById('marksLost').textContent = result.wrong * negativeMarks;
+
+        // Subject-wise performance
+        const subjectPerf = {};
+        result.responses.forEach(r => {
+            if (!subjectPerf[r.subject]) {
+                subjectPerf[r.subject] = { correct: 0, total: 0 };
+            }
+            subjectPerf[r.subject].total++;
+            if (r.isCorrect) subjectPerf[r.subject].correct++;
+        });
+
+        const subjectContainer = document.getElementById('subjectPerformance');
+        Object.entries(subjectPerf).forEach(([subject, data]) => {
+            const perc = (data.correct / data.total) * 100;
+            const colorClass = perc >= 70 ? 'high' : perc >= 40 ? 'medium' : 'low';
+            subjectContainer.innerHTML += `
+                <div class="subject-item">
+                    <span class="subject-name">${subject}</span>
+                    <div class="subject-bar">
+                        <div class="subject-fill ${colorClass}" style="width: ${perc}%">${Math.round(perc)}%</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Solutions
+        const letters = ['A', 'B', 'C', 'D'];
+        let currentFilter = 'all';
+
+        function renderSolutions(filter) {
+            const container = document.getElementById('solutionsList');
+            let filtered = result.responses;
+
+            if (filter === 'correct') filtered = filtered.filter(r => r.isCorrect);
+            else if (filter === 'wrong') filtered = filtered.filter(r => r.userAnswer !== null && !r.isCorrect);
+            else if (filter === 'skipped') filtered = filtered.filter(r => r.userAnswer === null);
+
+            container.innerHTML = filtered.map((r, i) => {
+                let status, statusClass;
+                if (r.userAnswer === null) { status = 'Skipped'; statusClass = 'skipped'; }
+                else if (r.isCorrect) { status = 'Correct'; statusClass = 'correct'; }
+                else { status = 'Wrong'; statusClass = 'wrong'; }
+
+                return `
+                    <div class="solution-item">
+                        <div class="solution-header">
+                            <div>
+                                <span class="solution-number">Q${result.responses.indexOf(r) + 1}</span>
+                                <span class="solution-subject">${r.subject}</span>
+                            </div>
+                            <span class="solution-status ${statusClass}">${status}</span>
+                        </div>
+                        <div class="solution-question">${r.question}</div>
+                        <div class="solution-options">
+                            ${r.options.map((opt, j) => {
+                    let optClass = '';
+                    if (j === r.correct) optClass = 'correct-answer';
+                    else if (j === r.userAnswer && !r.isCorrect) optClass = 'user-wrong';
+                    return `
+                                    <div class="solution-option ${optClass}">
+                                        <span class="letter">${letters[j]}</span>
+                                        ${opt}
+                                    </div>
+                                `;
+                }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        renderSolutions('all');
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderSolutions(btn.dataset.filter);
+            });
+        });
+
+        // Tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Leaderboard
+        const allResults = JSON.parse(localStorage.getItem('nudge_results')) || [];
+        const testResults = allResults.filter(r => r.testId === result.testId);
+
+        // Add demo users if needed
+        const demoUsers = [
+            { userName: 'Rahul S.', percentage: 92, correct: 69, wrong: 5, skipped: 1 },
+            { userName: 'Priya M.', percentage: 88, correct: 66, wrong: 7, skipped: 2 },
+            { userName: 'Amit K.', percentage: 85, correct: 64, wrong: 9, skipped: 2 },
+            { userName: 'Sneha R.', percentage: 78, correct: 58, wrong: 12, skipped: 5 },
+            { userName: 'Vikram P.', percentage: 72, correct: 54, wrong: 15, skipped: 6 }
+        ];
+
+        if (testResults.length < 6) {
+            demoUsers.forEach(d => {
+                testResults.push({
+                    ...d,
+                    userId: 'demo_' + d.userName,
+                    testId: result.testId,
+                    questions: result.questions
+                });
+            });
+        }
+
+        testResults.sort((a, b) => b.percentage - a.percentage);
+        const userRank = testResults.findIndex(r => r.userId === currentUser?.uid) + 1;
+
+        document.getElementById('userRank').textContent = '#' + (userRank || testResults.length);
+        document.getElementById('totalParticipants').textContent = testResults.length;
+
+        const leaderboardBody = document.getElementById('leaderboardBody');
+        testResults.slice(0, 10).forEach((r, i) => {
+            const isCurrentUser = r.userId === currentUser?.uid;
+            const attempted = r.correct + r.wrong;
+            const acc = attempted > 0 ? Math.round((r.correct / attempted) * 100) : 0;
+
+            let rankBadge = '';
+            if (i === 0) rankBadge = 'gold';
+            else if (i === 1) rankBadge = 'silver';
+            else if (i === 2) rankBadge = 'bronze';
+
+            leaderboardBody.innerHTML += `
+                <tr class="${isCurrentUser ? 'current-user' : ''}">
+                    <td><span class="rank-badge ${rankBadge}">${i + 1}</span></td>
+                    <td>${r.userName || 'Anonymous'}${isCurrentUser ? ' (You)' : ''}</td>
+                    <td>${Math.round(r.percentage)}%</td>
+                    <td>${acc}%</td>
+                </tr>
+            `;
+        });
+
+        // Confetti
+        function showConfetti() {
+            const container = document.getElementById('confetti');
+            const colors = ['#dc2626', '#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6'];
+
+            for (let i = 0; i < 100; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = Math.random() * 2 + 's';
+                piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                container.appendChild(piece);
+            }
+
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+    </script>
+</body>
+
+</html>
