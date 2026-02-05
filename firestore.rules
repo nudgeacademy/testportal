@@ -21,8 +21,8 @@ service cloud.firestore {
       // Users can read/write their own data
       allow read, write: if isOwner(userId);
       
-      // Admins can read any user
-      allow read: if isAdmin();
+      // Admins can read and update any user (for granting access)
+      allow read, write: if isAdmin();
       
       // User's results subcollection
       match /results/{resultId} {
@@ -88,6 +88,18 @@ service cloud.firestore {
       allow read: if isAdmin();
       
       // No modifications after creation (payment records are immutable)
+      allow update, delete: if false;
+    }
+    
+    // ========== ACCESS GRANTS COLLECTION (Admin Audit Log) ==========
+    match /accessGrants/{grantId} {
+      // Only admins can create access grants (audit log)
+      allow create: if isAdmin();
+      
+      // Admins can read access grants
+      allow read: if isAdmin();
+      
+      // No modifications (audit log is immutable)
       allow update, delete: if false;
     }
     
