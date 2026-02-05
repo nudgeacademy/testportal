@@ -1,6 +1,6 @@
 {
   "appId": "com.nudgeacademy.testportal",
-  "appName": "Nudge Academy",
+  "appName": "Nudge Mock",
   "webDir": "www",
   "server": {
     "androidScheme": "https",
