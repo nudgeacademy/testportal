@@ -599,6 +599,83 @@ const NudgeDB = {
         await ensureAuthReady();
         await db.collection('folders').doc(folderId).delete();
         return true;
+    },
+
+    // ========== ADMIN: USER MANAGEMENT FUNCTIONS ==========
+
+    // Get all registered users (admin only)
+    async getAllUsers() {
+        if (isDemoMode) {
+            console.log('📦 Demo mode: returning mock users');
+            return [
+                { uid: 'demo_user_1', name: 'Demo Student', email: 'student@demo.com', purchases: [], phone: '9999999999' }
+            ];
+        }
+
+        try {
+            await ensureAuthReady();
+            console.log('📡 Firestore: fetching all users...');
+            const snapshot = await db.collection('users').get();
+
+            if (snapshot.empty) {
+                console.log('⚠️ No users found in Firestore');
+                return [];
+            }
+
+            const users = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return { uid: doc.id, ...data };
+            });
+
+            console.log('✅ Returning', users.length, 'users from Firestore');
+            return users;
+        } catch (e) {
+            console.error('❌ Error fetching users:', e);
+            return [];
+        }
+    },
+
+    // Grant access to a user (admin function - adds item to user's purchases)
+    async grantAccess(uid, itemId, itemName = '') {
+        console.log('🔓 Granting access:', uid, 'for item:', itemId);
+
+        if (isDemoMode) {
+            console.log('📦 Demo mode: simulating access grant');
+            return { success: true, message: 'Demo mode - access granted' };
+        }
+
+        try {
+            await ensureAuthReady();
+
+            // Add the item to user's purchases array
+            await db.collection('users').doc(uid).set({
+                purchases: firebase.firestore.FieldValue.arrayUnion(itemId),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            // Also add by name if provided (for backwards compatibility)
+            if (itemName && itemName !== itemId) {
+                await db.collection('users').doc(uid).set({
+                    purchases: firebase.firestore.FieldValue.arrayUnion(itemName),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            }
+
+            // Log the grant for audit purposes
+            await db.collection('accessGrants').add({
+                userId: uid,
+                itemId: itemId,
+                itemName: itemName,
+                grantedBy: window.ADMIN_USER?.email || 'admin',
+                grantedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            console.log('✅ Access granted successfully');
+            return { success: true, message: 'Access granted successfully' };
+        } catch (e) {
+            console.error('❌ Error granting access:', e);
+            return { success: false, message: e.message };
+        }
     }
 };
 
