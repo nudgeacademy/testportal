@@ -637,7 +637,7 @@ const NudgeDB = {
 
     // Grant access to a user (admin function - adds item to user's purchases)
     async grantAccess(uid, itemId, itemName = '') {
-        console.log('🔓 Granting access:', uid, 'for item:', itemId);
+        console.log('🔓 Granting access:', uid, 'for item:', itemId, 'name:', itemName);
 
         if (isDemoMode) {
             console.log('📦 Demo mode: simulating access grant');
@@ -647,19 +647,14 @@ const NudgeDB = {
         try {
             await ensureAuthReady();
 
-            // Add the item to user's purchases array
+            // Use folder name for purchases (this is what the student dashboard checks)
+            // Only add one entry to avoid double-counting
+            const purchaseValue = itemName || itemId;
+
             await db.collection('users').doc(uid).set({
-                purchases: firebase.firestore.FieldValue.arrayUnion(itemId),
+                purchases: firebase.firestore.FieldValue.arrayUnion(purchaseValue),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
-
-            // Also add by name if provided (for backwards compatibility)
-            if (itemName && itemName !== itemId) {
-                await db.collection('users').doc(uid).set({
-                    purchases: firebase.firestore.FieldValue.arrayUnion(itemName),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-            }
 
             // Log the grant for audit purposes
             await db.collection('accessGrants').add({
