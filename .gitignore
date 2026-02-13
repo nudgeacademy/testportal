@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Capacitor build directories
+ios/App/Pods/
+ios/App/DerivedData/
+ios/.build/
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+
+# IDE
+.idea/
+*.xcworkspace
+*.xcuserstate
+DerivedData/
+.DS_Store
+
+# Build artifacts
+www/

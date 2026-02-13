@@ -1,0 +1,21 @@
+{
+  "name": "nudge-academy-testportal",
+  "version": "1.0.0",
+  "description": "Nudge Academy Test Portal - CUET Preparation Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": [
+    "cuet",
+    "exam",
+    "test",
+    "education",
+    "nudge-academy"
+  ],
+  "author": "Nudge Academy",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {}
+}
