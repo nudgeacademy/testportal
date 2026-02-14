@@ -2088,7 +2088,7 @@
         <!-- Available Tests -->
         <section class="section">
             <div class="section-header">
-                <button class="back-btn" id="backToFoldersBtn" onclick="closeFolder()">
+                <button class="back-btn" id="backToFoldersBtn" onclick="history.back()">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -2619,9 +2619,15 @@
         let currentFolder = null;
 
         // Open Folder
-        function openFolder(folderInfo) {
+        function openFolder(folderInfo, updateHistory = true) {
             // Updated Logic: Always open folder, lock individual tests inside if not purchased
             currentFolder = folderInfo.name;
+
+            if (updateHistory) {
+                const url = new URL(window.location);
+                url.hash = `folder=${encodeURIComponent(folderInfo.name)}`;
+                history.pushState({ folder: folderInfo }, '', url);
+            }
 
             // Check purchase status just to update UI if needed (though renderTests handles it)
             // const isPurchased = folderInfo.price === 0 || purchases.includes(folderInfo.id) || purchases.includes(folderInfo.name);
@@ -2644,6 +2650,15 @@
             document.getElementById('backToFoldersBtn').style.display = 'none';
             renderTests();
         }
+
+        // Handle Back Button
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.folder) {
+                openFolder(event.state.folder, false);
+            } else {
+                closeFolder();
+            }
+        });
 
         // Render tests
         function renderTests() {
