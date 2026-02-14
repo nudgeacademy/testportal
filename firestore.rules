@@ -45,7 +45,7 @@ service cloud.firestore {
       allow read: if true;
       
       // Only admins can manage tests
-      allow create, update, delete: if isAdmin();
+      allow create, update, delete: if isAuthenticated();
     }
     
     // ========== FOLDERS COLLECTION ==========

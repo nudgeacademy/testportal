@@ -1240,6 +1240,14 @@
                                 <h2 class="card-title">Step 1: Upload Questions (JSON)</h2>
                             </div>
                             <div class="card-body">
+                                <div
+                                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                                    <div style="font-weight:600;">Upload Files</div>
+                                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                                        <input type="checkbox" id="batchModeToggle" onchange="toggleBatchMode()">
+                                        <span>Batch Mode (One test per file)</span>
+                                    </label>
+                                </div>
                                 <div class="upload-zone" id="uploadZone">
                                     <div class="upload-icon">📄</div>
                                     <h3>Drop your files here</h3>
@@ -1488,6 +1496,7 @@
         console.log('✅ Admin authenticated:', adminUser.email);
 
         let uploadedQuestions = [];
+        let batchTests = []; // Store multiple tests for batch mode
         let customTests = [];
         let customFolders = [];
         let editingTestId = null;
@@ -1570,13 +1579,16 @@
 
         async function handleFiles(files) {
             document.getElementById('loadingIndicator').style.display = 'flex';
+            const isBatch = document.getElementById('batchModeToggle').checked;
 
-            // Auto-naming: Set test name from file name if empty
-            if (files.length > 0 && !document.getElementById('testName').value) {
+            // Auto-naming in single mode
+            if (!isBatch && files.length > 0 && !document.getElementById('testName').value) {
                 const name = files[0].name.replace(/\.[^/.]+$/, ""); // Remove extension
                 document.getElementById('testName').value = name;
             }
+            
             let totalAdded = 0;
+            let newBatchTests = [];
 
             try {
                 for (const file of files) {
@@ -1590,17 +1602,30 @@
                     }
 
                     if (questions && questions.length) {
-                        uploadedQuestions = [...uploadedQuestions, ...questions];
+                        if (isBatch) {
+                            newBatchTests.push({
+                                title: file.name.replace(/\.[^/.]+$/, ""),
+                                questions: questions
+                            });
+                        } else {
+                            uploadedQuestions = [...uploadedQuestions, ...questions];
+                        }
                         totalAdded += questions.length;
                     }
                 }
 
                 if (totalAdded === 0) throw new Error('No valid questions found in uploaded files');
 
-                document.getElementById('uploadSummary').style.display = 'flex';
-                document.getElementById('uploadFileName').textContent = `${files.length} File(s) Processed`;
-                document.getElementById('uploadCount').textContent = uploadedQuestions.length;
+                if (isBatch) {
+                    batchTests = [...batchTests, ...newBatchTests];
+                    document.getElementById('uploadFileName').textContent = `${batchTests.length} Tests Queued`;
+                    document.getElementById('uploadCount').textContent = totalAdded;
+                } else {
+                     document.getElementById('uploadFileName').textContent = `${files.length} File(s) Processed`;
+                     document.getElementById('uploadCount').textContent = uploadedQuestions.length;
+                }
 
+                document.getElementById('uploadSummary').style.display = 'flex';
                 renderPreview();
                 document.getElementById('previewCard').style.display = 'block';
                 document.getElementById('nextBtn1').disabled = false;
@@ -1698,14 +1723,35 @@
 
         function clearUpload() {
             uploadedQuestions = [];
+            batchTests = [];
             document.getElementById('uploadSummary').style.display = 'none';
             document.getElementById('previewCard').style.display = 'none';
             document.getElementById('nextBtn1').disabled = true;
             fileInput.value = '';
         }
 
+        function toggleBatchMode() {
+            clearUpload();
+            // Optional: visual updates
+        }
+
         function renderPreview() {
             const container = document.getElementById('questionsPreview');
+            const isBatch = document.getElementById('batchModeToggle').checked;
+
+            if (isBatch) {
+                container.innerHTML = batchTests.map((test, i) => `
+                    <div class="test-preview-item" style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                        <div>
+                            <strong>${i + 1}. ${test.title}</strong>
+                            <div style="font-size:0.85em; color:#666;">${test.questions.length} Questions</div>
+                        </div>
+                        <span class="badge badge-success">Ready</span>
+                    </div>
+                `).join('');
+                return;
+            }
+
             // Show ALL questions as requested
             container.innerHTML = uploadedQuestions.map((q, i) => `
                 <div class="question-preview">
@@ -1724,6 +1770,8 @@
 
         // Steps
         function goToStep(step) {
+            const isBatch = document.getElementById('batchModeToggle').checked;
+            
             [1, 2, 3].forEach(i => {
                 const el = document.getElementById(`step${i}`);
                 el.classList.remove('active', 'completed');
@@ -1732,54 +1780,65 @@
                 document.getElementById(`stepContent${i}`).style.display = i === step ? 'block' : 'none';
             });
 
+            if (step === 2) {
+                // Toggle test name field
+                const nameGroup = document.getElementById('testName').closest('.form-group');
+                if (nameGroup) nameGroup.style.display = isBatch ? 'none' : 'block';
+                
+                document.querySelector('#stepContent2 .card-title').textContent = isBatch 
+                    ? 'Step 2: Configure Common Settings' 
+                    : 'Step 2: Configure Test';
+            }
+
             if (step === 3) {
                 const name = document.getElementById('testName').value || 'Untitled';
                 const marks = parseInt(document.getElementById('testMarks').value) || 5;
-                document.getElementById('reviewName').textContent = name;
-                document.getElementById('reviewType').textContent = document.getElementById('testType').value;
-                document.getElementById('reviewQuestions').textContent = uploadedQuestions.length;
-                document.getElementById('reviewDuration').textContent = document.getElementById('testDuration').value + ' mins';
-                document.getElementById('reviewMarksTotal').textContent = (uploadedQuestions.length * marks) + ' marks';
-                document.getElementById('reviewNegative').textContent = document.getElementById('testNegative').value + ' per wrong';
-                document.getElementById('reviewPrice').textContent = '₹' + (document.getElementById('testPrice').value || 0);
+                const duration = document.getElementById('testDuration').value;
+                const type = document.getElementById('testType').value;
+                const negative = document.getElementById('testNegative').value;
+                const price = document.getElementById('testPrice').value || 0;
+
+                if (isBatch) {
+                    const totalQ = batchTests.reduce((acc, t) => acc + t.questions.length, 0);
+                    document.getElementById('reviewName').textContent = `BATCH: ${batchTests.length} Tests`;
+                    document.getElementById('reviewType').textContent = type;
+                    document.getElementById('reviewQuestions').textContent = `${totalQ} Questions across ${batchTests.length} tests`;
+                    document.getElementById('reviewDuration').textContent = `${duration} mins (each)`;
+                    document.getElementById('reviewMarksTotal').textContent = `Depends on Q count`;
+                    document.getElementById('reviewNegative').textContent = `${negative} per wrong`;
+                    document.getElementById('reviewPrice').textContent = `₹${price} (folder price applies)`;
+                } else {
+                    document.getElementById('reviewName').textContent = name;
+                    document.getElementById('reviewType').textContent = type;
+                    document.getElementById('reviewQuestions').textContent = uploadedQuestions.length;
+                    document.getElementById('reviewDuration').textContent = duration + ' mins';
+                    document.getElementById('reviewMarksTotal').textContent = (uploadedQuestions.length * marks) + ' marks';
+                    document.getElementById('reviewNegative').textContent = negative + ' per wrong';
+                    document.getElementById('reviewPrice').textContent = '₹' + price;
+                }
             }
         }
 
         // Publish
         async function publishTest() {
-            const name = document.getElementById('testName').value;
-            if (!name) { showToast('Enter test name', 'error'); goToStep(2); return; }
-            if (!uploadedQuestions.length) { showToast('No questions', 'error'); goToStep(1); return; }
+            const isBatch = document.getElementById('batchModeToggle').checked;
+            
+            // Single Mode Validation
+            if (!isBatch) {
+                const name = document.getElementById('testName').value;
+                if (!name) { showToast('Enter test name', 'error'); goToStep(2); return; }
+                if (!uploadedQuestions.length) { showToast('No questions', 'error'); goToStep(1); return; }
+            } else {
+                if (!batchTests.length) { showToast('No tests in batch', 'error'); goToStep(1); return; }
+            }
 
             const duration = parseInt(document.getElementById('testDuration').value);
             const marksPerQ = parseInt(document.getElementById('testMarks').value);
             const negative = parseFloat(document.getElementById('testNegative').value);
             const folderName = document.getElementById('testFolder').value;
-            const subjects = folderName ? [folderName] : ['General']; // Map folder to subject
-
-            const testData = {
-                title: name,
-                type: document.getElementById('testType').value,
-                questions: uploadedQuestions.length,
-                duration: duration,
-                marks: uploadedQuestions.length * marksPerQ,
-                marksPerQuestion: marksPerQ,
-                negativeMarks: negative,
-                price: 0, // Price is on the folder now
-                subjects: subjects,
-                folderId: folderName, // Store folder grouping info
-                questionData: uploadedQuestions.map((q, i) => ({
-                    id: `q_${i}`,
-                    question: q.question,
-                    options: q.options.map(o => o.text),
-                    correct: q.options.findIndex(o => o.correct),
-                    solution: q.solution || ''
-                })),
-                status: 'active',
-                active: true,
-                icon: '📝',
-                updatedAt: new Date().toISOString()
-            };
+            const subjects = folderName ? [folderName] : ['General']; 
+            const type = document.getElementById('testType').value;
+            const price = 0; // Price on folder
 
             const btn = document.querySelector('#stepContent3 .btn-success');
             const originalText = btn.textContent;
@@ -1787,14 +1846,75 @@
             btn.textContent = 'Publishing...';
 
             try {
-                if (editingTestId) {
-                    testData.id = editingTestId;
-                    await NudgeDB.saveTest(testData);
-                    showToast(`"${name}" updated!`, 'success');
+                if (isBatch) {
+                    // Batch Publish
+                    let count = 0;
+                    for (const test of batchTests) {
+                        const testData = {
+                            title: test.title,
+                            type: type,
+                            questions: test.questions.length,
+                            duration: duration,
+                            marks: test.questions.length * marksPerQ,
+                            marksPerQuestion: marksPerQ,
+                            negativeMarks: negative,
+                            price: price,
+                            subjects: subjects,
+                            folderId: folderName,
+                            questionData: test.questions.map((q, i) => ({
+                                id: `q_${i}`,
+                                question: q.question,
+                                options: q.options.map(o => o.text),
+                                correct: q.options.findIndex(o => o.correct),
+                                solution: q.solution || ''
+                            })),
+                            status: 'active',
+                            active: true,
+                            icon: '📝',
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        };
+                        await NudgeDB.saveTest(testData);
+                        count++;
+                        btn.textContent = `Publishing ${count}/${batchTests.length}...`;
+                    }
+                    showToast(`Batch published ${count} tests!`, 'success');
                 } else {
-                    testData.createdAt = new Date().toISOString();
-                    await NudgeDB.saveTest(testData);
-                    showToast(`"${name}" published!`, 'success');
+                    // Single Publish
+                    const name = document.getElementById('testName').value;
+                    const testData = {
+                        title: name,
+                        type: type,
+                        questions: uploadedQuestions.length,
+                        duration: duration,
+                        marks: uploadedQuestions.length * marksPerQ,
+                        marksPerQuestion: marksPerQ,
+                        negativeMarks: negative,
+                        price: price,
+                        subjects: subjects,
+                        folderId: folderName,
+                        questionData: uploadedQuestions.map((q, i) => ({
+                            id: `q_${i}`,
+                            question: q.question,
+                            options: q.options.map(o => o.text),
+                            correct: q.options.findIndex(o => o.correct),
+                            solution: q.solution || ''
+                        })),
+                        status: 'active',
+                        active: true,
+                        icon: '📝',
+                        updatedAt: new Date().toISOString()
+                    };
+
+                    if (editingTestId) {
+                        testData.id = editingTestId;
+                        await NudgeDB.saveTest(testData);
+                        showToast(`"${name}" updated!`, 'success');
+                    } else {
+                        testData.createdAt = new Date().toISOString();
+                        await NudgeDB.saveTest(testData);
+                        showToast(`"${name}" published!`, 'success');
+                    }
                 }
 
                 // Refresh all data
@@ -1805,7 +1925,7 @@
                 setTimeout(() => showSection('tests'), 1000);
             } catch (error) {
                 console.error("Publish error:", error);
-                showToast('Failed to save test: ' + error.message, 'error');
+                showToast('Failed to save: ' + error.message, 'error');
             } finally {
                 btn.disabled = false;
                 btn.textContent = originalText;
@@ -1833,6 +1953,9 @@
         function resetForm() {
             editingTestId = null;
             clearUpload();
+            if(document.getElementById('batchModeToggle')) {
+                document.getElementById('batchModeToggle').checked = false; // Reset toggle
+            }
             document.getElementById('testName').value = '';
             document.getElementById('testType').selectedIndex = 0;
             document.getElementById('testDuration').value = 45;
