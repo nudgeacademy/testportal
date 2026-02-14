@@ -2695,9 +2695,7 @@
                 grid.innerHTML = allFolders.map(folder => {
                     const isPurchased = folder.price === 0 || purchases.includes(folder.id) || purchases.includes(folder.name) || folder.isVirtual;
                     const folderStr = JSON.stringify(folder).replace(/"/g, '&quot;');
-                    const priceHtml = folder.price > 0 && !isPurchased ?
-                        `<div class="folder-card-price"><small>₹</small>${folder.price}</div>` :
-                        (isPurchased ? `<div class="folder-card-price is-owned">✓ Owned</div>` : `<div class="folder-card-price is-free">Free</div>`);
+                    const priceHtml = '';
 
                     return `
                     <div class="folder-card" onclick="openFolder(${folderStr})">
