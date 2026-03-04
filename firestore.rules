@@ -16,6 +16,11 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
     
+    function isMentor() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/mentors/$(request.auth.uid));
+    }
+    
     // ========== USERS COLLECTION ==========
     match /users/{userId} {
       // Users can read/write their own data
@@ -24,10 +29,13 @@ service cloud.firestore {
       // Admins can read and update any user (for granting access)
       allow read, write: if isAdmin();
       
+      // Mentors can read any user's profile
+      allow read: if isMentor();
+      
       // User's results subcollection
       match /results/{resultId} {
         allow read, write: if isOwner(userId);
-        allow read: if isAdmin();
+        allow read: if isAdmin() || isMentor();
       }
       
       // User's payments subcollection
@@ -109,6 +117,14 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       
       // No one can write via client (manage via Firebase Console only)
+      allow write: if false;
+    }
+
+    // ========== MENTORS COLLECTION ==========
+    match /mentors/{mentorId} {
+      // Authenticated users can read (to verify mentor status during login)
+      allow read: if isAuthenticated();
+      
       allow write: if false;
     }
   }

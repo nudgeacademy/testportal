@@ -406,6 +406,55 @@ const NudgeDB = {
         }
     },
 
+    // Verify mentor credentials
+    async verifyMentor(email, password) {
+        if (isDemoMode) {
+            const validMentors = [
+                { email: 'nada@nudge.academy', password: 'nudgeacademy', name: 'Nudge Mentor' }
+            ];
+            const mentor = validMentors.find(a => a.email === email && a.password === password);
+            return mentor ? { ...mentor, role: 'mentor' } : null;
+        }
+
+        try {
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            let mentorData = null;
+
+            try {
+                const uidDoc = await db.collection('mentors').doc(user.uid).get();
+                if (uidDoc.exists) {
+                    mentorData = uidDoc.data();
+                }
+            } catch (err) { }
+
+            if (!mentorData) {
+                try {
+                    const snapshot = await db.collection('mentors').where('email', '==', email).get();
+                    if (!snapshot.empty) {
+                        mentorData = snapshot.docs[0].data();
+                    }
+                } catch (err) { }
+            }
+
+            if (mentorData) {
+                return {
+                    ...mentorData,
+                    uid: user.uid,
+                    email: user.email,
+                    name: mentorData.name || user.email.split('@')[0],
+                    role: 'mentor'
+                };
+            } else {
+                await auth.signOut();
+                return null;
+            }
+        } catch (error) {
+            throw error;
+        }
+    },
+
     // Logout user
     async logout() {
         try {
@@ -457,12 +506,12 @@ const NudgeDB = {
             });
 
             console.log('✅ Returning', tests.length, 'tests from Firestore');
-            
+
             // Sort by custom order
             return tests.sort((a, b) => {
                 const orderA = a.order !== undefined ? a.order : 999999;
                 const orderB = b.order !== undefined ? b.order : 999999;
-                
+
                 // If orders are equal (or both undefined), fall back to createdAt desc (newest first)
                 if (orderA === orderB) {
                     // Handle Firestore timestamps or ISO strings
