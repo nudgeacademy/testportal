@@ -608,6 +608,100 @@
             font-size: 1.1rem;
         }
 
+        /* Result Expander Styles */
+        .result-item.expandable {
+            flex-direction: column;
+            align-items: stretch;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .result-item.expandable:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.05);
+        }
+
+        .result-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .result-breakdown {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--gray-200);
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-item.expanded .result-breakdown {
+            display: grid;
+        }
+
+        .result-item.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .breakdown-stat {
+            background: var(--gray-50);
+            padding: 12px;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .breakdown-stat .label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .breakdown-stat .value {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .b-correct .value {
+            color: #10b981;
+        }
+
+        .b-wrong .value {
+            color: #ef4444;
+        }
+
+        .b-skipped .value {
+            color: #f59e0b;
+        }
+
+        .b-time .value {
+            color: #3b82f6;
+        }
+
+        .expand-icon {
+            color: var(--gray-400);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media (max-width: 1024px) {
             .metrics-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -656,10 +750,32 @@
                 gap: 16px;
             }
 
+            .result-item.expandable {
+                align-items: stretch;
+            }
+
+            .result-header-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                position: relative;
+            }
+
+            .expand-icon {
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
+
             .result-details {
                 flex-wrap: wrap;
                 width: 100%;
                 justify-content: space-between;
+                gap: 12px;
+            }
+
+            .result-breakdown {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -954,28 +1070,65 @@
                 }
 
                 modalBody.innerHTML = '<h3 style="margin-bottom:16px; color:var(--dark);">Recent Attempts (Max 5)</h3>' +
-                    results.map(r => `
-                    <div class="result-item">
-                        <div>
-                            <div style="font-weight:700; color:var(--dark); margin-bottom:8px; font-size:1.1rem;">${r.testTitle || 'Unknown Test'}</div>
-                            <div style="color:var(--gray-500); font-size:0.85rem;">Date: ${new Date(r.date || r.createdAt).toLocaleString()}</div>
+                    results.map(r => {
+                        const attempted = r.attempted !== undefined ? r.attempted : ((r.correct || 0) + (r.wrong || 0));
+                        const maxScore = r.maxScore || r.totalScore || 0;
+                        const totalQs = r.questions || r.totalQuestions || 0;
+
+                        // Format time
+                        const timeTaken = r.timeTaken || 0;
+                        const mins = Math.floor(timeTaken / 60);
+                        const secs = timeTaken % 60;
+                        const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+                        return `
+                        <div class="result-item expandable" onclick="this.classList.toggle('expanded')">
+                            <div class="result-header-row">
+                                <div>
+                                    <div style="font-weight:700; color:var(--dark); margin-bottom:4px; font-size:1.1rem;">${r.testTitle || 'Unknown Test'}</div>
+                                    <div style="color:var(--gray-500); font-size:0.85rem;">${new Date(r.date || r.createdAt).toLocaleString()}</div>
+                                </div>
+                                <div class="result-details">
+                                    <div class="result-stat">
+                                        <span class="label">Score</span>
+                                        <span class="value" style="color:var(--primary);">${r.score} / ${maxScore}</span>
+                                    </div>
+                                    <div class="result-stat">
+                                        <span class="label">Accuracy</span>
+                                        <span class="value">${Math.round(r.percentage || 0)}%</span>
+                                    </div>
+                                    <div class="result-stat">
+                                        <span class="label">Attempted</span>
+                                        <span class="value">${attempted} / ${totalQs}</span>
+                                    </div>
+                                    <div class="expand-icon">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="result-breakdown">
+                                <div class="breakdown-stat b-correct">
+                                    <div class="label">Correct</div>
+                                    <div class="value">${r.correct || 0}</div>
+                                </div>
+                                <div class="breakdown-stat b-wrong">
+                                    <div class="label">Wrong</div>
+                                    <div class="value">${r.wrong || 0}</div>
+                                </div>
+                                <div class="breakdown-stat b-skipped">
+                                    <div class="label">Skipped</div>
+                                    <div class="value">${r.skipped || (totalQs - attempted) || 0}</div>
+                                </div>
+                                <div class="breakdown-stat b-time">
+                                    <div class="label">Time Taken</div>
+                                    <div class="value">${timeStr}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="result-details">
-                            <div class="result-stat">
-                                <span class="label">Score</span>
-                                <span class="value" style="color:var(--primary);">${r.score} / ${r.totalScore}</span>
-                            </div>
-                            <div class="result-stat">
-                                <span class="label">Accuracy</span>
-                                <span class="value">${r.percentage}%</span>
-                            </div>
-                            <div class="result-stat">
-                                <span class="label">Attempted</span>
-                                <span class="value">${r.attempted} / ${r.totalQuestions}</span>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
+                    `}).join('');
 
             } catch (error) {
                 console.error("Error fetching results", error);
