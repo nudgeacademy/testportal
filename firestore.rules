@@ -17,8 +17,10 @@ service cloud.firestore {
     }
     
     function isMentor() {
-      return isAuthenticated() && 
-        exists(/databases/$(database)/documents/mentors/$(request.auth.uid));
+      return isAuthenticated() && (
+        exists(/databases/$(database)/documents/mentors/$(request.auth.uid)) ||
+        request.auth.token.email == 'nada@nudge.academy'
+      );
     }
     
     // ========== USERS COLLECTION ==========

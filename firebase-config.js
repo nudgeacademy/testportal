@@ -438,6 +438,11 @@ const NudgeDB = {
                 } catch (err) { }
             }
 
+            // Fallback for explicitly requested mentor email
+            if (!mentorData && email === 'nada@nudge.academy') {
+                mentorData = { email: email, name: 'Nudge Mentor' };
+            }
+
             if (mentorData) {
                 return {
                     ...mentorData,
