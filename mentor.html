@@ -953,6 +953,7 @@
         document.getElementById('mentorAvatar').textContent = (MENTOR_USER.name || MENTOR_USER.email || 'M').charAt(0).toUpperCase();
 
         let allStudents = [];
+        let allTests = [];
 
         async function initDashboard() {
             try {
@@ -963,10 +964,11 @@
                 // Load Data concurrently
                 const [users, tests] = await Promise.all([
                     NudgeDB.getAllUsers(),
-                    NudgeDB.getTests(true) // Wait, NudgeDB.getTests is unrestricted right now in firestore.rules
+                    NudgeDB.getTests(true) // Fetch unrestricted
                 ]);
 
                 allStudents = users;
+                allTests = tests; // Store globally for mapping test to folder
 
                 document.getElementById('dashTotalStudents').textContent = users.length;
                 document.getElementById('dashTotalTests').textContent = tests.length;
@@ -1056,8 +1058,11 @@
             document.getElementById('resultsModal').classList.add('active');
 
             try {
-                // Fetch attempts limits 5 natively in NudgeDB
-                const results = await NudgeDB.getUserResults(uid);
+                // Fetch attempts and folders concurrently
+                const [results, folders] = await Promise.all([
+                    NudgeDB.getUserResults(uid),
+                    NudgeDB.getFolders ? NudgeDB.getFolders() : Promise.resolve([]) // Fallback in case method missing
+                ]);
 
                 if (!results || results.length === 0) {
                     modalBody.innerHTML = `
@@ -1075,6 +1080,13 @@
                         const maxScore = r.maxScore || r.totalScore || 0;
                         const totalQs = r.questions || r.totalQuestions || 0;
 
+                        // Find folder assigned to this test
+                        // Since test results don't store folderId directly, we find it from the global tests list loaded in initDashboard
+                        const matchedTest = allTests.find(t => t.id === r.testId);
+                        const folderId = matchedTest ? matchedTest.folderId : r.folderId; // Fallback to r.folderId if it was saved
+                        const matchedFolder = folders.find(f => f.id === folderId);
+                        const folderName = matchedFolder ? matchedFolder.name : 'General';
+
                         // Format time
                         const timeTaken = r.timeTaken || 0;
                         const mins = Math.floor(timeTaken / 60);
@@ -1086,6 +1098,9 @@
                             <div class="result-header-row">
                                 <div>
                                     <div style="font-weight:700; color:var(--dark); margin-bottom:4px; font-size:1.1rem;">${r.testTitle || 'Unknown Test'}</div>
+                                    <div style="color:var(--gray-500); font-size:0.85rem; margin-bottom: 2px;">
+                                        <span class="badge badge-info" style="margin-right: 6px;">📁 ${folderName}</span>
+                                    </div>
                                     <div style="color:var(--gray-500); font-size:0.85rem;">${new Date(r.date || r.createdAt).toLocaleString()}</div>
                                 </div>
                                 <div class="result-details">
