@@ -2754,7 +2754,7 @@
             const folderTests = availableTests.filter(t => {
                 const subject = (t.subjects && t.subjects.length > 0) ? t.subjects[0] : 'General';
                 return subject === currentFolder;
-            });
+            }).reverse();
 
             if (folderTests.length === 0) {
                 grid.innerHTML = '<div class="empty-state">No tests found in this folder</div>';
