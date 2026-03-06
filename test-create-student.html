@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Create</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>Testing Student Creation</h1>
+    <div id="output"></div>
+    <script>
+        async function runTest() {
+            const out = document.getElementById('output');
+            out.innerHTML += 'Starting test...<br>';
+            
+            // Mock admin user
+            window.ADMIN_USER = { email: 'admin@nudge.com', role: 'admin' };
+            
+            try {
+                out.innerHTML += 'Calling NudgeDB.createStudent...<br>';
+                const res = await NudgeDB.createStudent({
+                    name: 'Test Tester',
+                    email: `test${Date.now()}@example.com`,
+                    password: 'password123',
+                    phone: '1234567890'
+                });
+                out.innerHTML += `Result: ${JSON.stringify(res)}<br>`;
+            } catch (e) {
+                out.innerHTML += `Error: ${e.message}<br>`;
+            }
+        }
+        
+        // Wait for auth init before running
+        setTimeout(runTest, 1500);
+    </script>
+</body>
+</html>
