@@ -739,6 +739,66 @@ const NudgeDB = {
             console.error('❌ Error granting access:', e);
             return { success: false, message: e.message };
         }
+    },
+
+    // Create a new student account (admin function)
+    async createStudent({ name, email, password, phone }) {
+        if (isDemoMode) {
+            console.log('📦 Demo mode: simulating student creation', { name, email, phone });
+            return { success: true, message: 'Demo mode - student created successfully' };
+        }
+
+        try {
+            await ensureAuthReady();
+
+            // Check if user is admin
+            if (!window.ADMIN_USER) {
+                return { success: false, message: 'Unauthorized: Admin access required' };
+            }
+
+            console.log('🧑‍🎓 Creating new student:', email);
+
+            // Create a secondary Firebase app instance to handle the auth creation
+            // This prevents the current admin user from being signed out
+            const appName = 'SecondaryApp_' + Date.now();
+            const secondaryApp = firebase.initializeApp(firebaseConfig, appName);
+
+            try {
+                // Create the user in Auth
+                const userCredential = await secondaryApp.auth().createUserWithEmailAndPassword(email, password);
+                const uid = userCredential.user.uid;
+
+                // Save the user profile to Firestore using the MAIN app instance
+                const userData = {
+                    uid: uid,
+                    name: name,
+                    email: email,
+                    phone: phone || '',
+                    role: 'student',
+                    purchases: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection('users').doc(uid).set(userData);
+
+                console.log('✅ Student created successfully with UID:', uid);
+
+                // Sign out of the secondary app and delete the instance
+                await secondaryApp.auth().signOut();
+                await secondaryApp.delete();
+
+                return { success: true, message: 'Student created successfully', uid: uid };
+            } catch (authError) {
+                // Make sure we clean up the secondary app even if creation fails
+                await secondaryApp.delete();
+                console.error('❌ Auth error creating student:', authError);
+                return { success: false, message: authError.message };
+            }
+        } catch (e) {
+            console.error('❌ General error creating student:', e);
+            return { success: false, message: e.message };
+        }
     }
 };
 

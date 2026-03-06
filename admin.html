@@ -1424,6 +1424,8 @@
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">Registered Students</h2>
+                            <button class="btn btn-primary btn-sm" onclick="showAddStudentModal()">+ Add
+                                Student</button>
                         </div>
                         <div class="card-body">
                             <!-- Mobile-friendly table -->
@@ -1476,6 +1478,43 @@
                         Grant Access
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div class="modal-overlay" id="addStudentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Student</h2>
+                <p>Create a new student account manually.</p>
+            </div>
+            <div class="modal-body">
+                <form id="addStudentForm" onsubmit="event.preventDefault(); submitAddStudent();">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="addStudentName" required placeholder="e.g., Ahsan Ali">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="addStudentEmail" required placeholder="e.g., student@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="text" id="addStudentPassword" required placeholder="Minimum 6 characters"
+                            minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number (Optional)</label>
+                        <input type="tel" id="addStudentPhone" placeholder="10-digit number">
+                    </div>
+                    <div style="margin-top:24px; display:flex; gap:12px; justify-content:flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddStudentModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="addStudentSubmitBtn">
+                            Create Student
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -2298,6 +2337,63 @@
         document.getElementById('grantAccessModal')?.addEventListener('click', function (e) {
             if (e.target === this) {
                 closeGrantAccessModal();
+            }
+        });
+
+        // ========== ADD STUDENT MODAL FUNCTIONS ==========
+        function showAddStudentModal() {
+            document.getElementById('addStudentForm').reset();
+            document.getElementById('addStudentModal').classList.add('active');
+        }
+
+        function closeAddStudentModal() {
+            document.getElementById('addStudentModal').classList.remove('active');
+        }
+
+        async function submitAddStudent() {
+            const name = document.getElementById('addStudentName').value;
+            const email = document.getElementById('addStudentEmail').value;
+            const password = document.getElementById('addStudentPassword').value;
+            const phone = document.getElementById('addStudentPhone').value;
+
+            if (!name || !email || !password) {
+                showToast('Name, Email, and Password are required', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('addStudentSubmitBtn');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+            showToast('Creating student account...', 'info');
+
+            try {
+                const result = await NudgeDB.createStudent({ name, email, password, phone });
+
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    closeAddStudentModal();
+                    await renderStudents(); // Refresh the students table
+                } else {
+                    showToast('Failed to create student: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error in submitAddStudent:', error);
+                showToast('An unexpected error occurred', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        document.getElementById('addStudentModal')?.addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeAddStudentModal();
             }
         });
 
