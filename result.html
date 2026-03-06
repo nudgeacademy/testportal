@@ -1475,6 +1475,11 @@
                                 `;
                 }).join('')}
                         </div>
+                        ${r.solution ? `
+                        <div class="solution-explanation" style="margin-top: 1rem; padding: 1rem; background: var(--blue-50); border: 1px solid var(--blue-200); border-radius: 8px;">
+                            <strong style="color: var(--blue-800); display: block; margin-bottom: 0.5rem;">📄 Explanation:</strong>
+                            <div style="color: var(--blue-900); font-size: 0.95rem;">${r.solution}</div>
+                        </div>` : ''}
                     </div>
                 `;
             }).join('');
