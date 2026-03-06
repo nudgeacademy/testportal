@@ -436,6 +436,15 @@
             white-space: pre-wrap;
         }
 
+        .question-preview svg,
+        .option-item svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1rem auto;
+            background: transparent;
+        }
+
         .question-options {
             display: flex;
             flex-direction: column;
@@ -1586,7 +1595,7 @@
                 const name = files[0].name.replace(/\.[^/.]+$/, ""); // Remove extension
                 document.getElementById('testName').value = name;
             }
-            
+
             let totalAdded = 0;
             let newBatchTests = [];
 
@@ -1621,8 +1630,8 @@
                     document.getElementById('uploadFileName').textContent = `${batchTests.length} Tests Queued`;
                     document.getElementById('uploadCount').textContent = totalAdded;
                 } else {
-                     document.getElementById('uploadFileName').textContent = `${files.length} File(s) Processed`;
-                     document.getElementById('uploadCount').textContent = uploadedQuestions.length;
+                    document.getElementById('uploadFileName').textContent = `${files.length} File(s) Processed`;
+                    document.getElementById('uploadCount').textContent = uploadedQuestions.length;
                 }
 
                 document.getElementById('uploadSummary').style.display = 'flex';
@@ -1771,7 +1780,7 @@
         // Steps
         function goToStep(step) {
             const isBatch = document.getElementById('batchModeToggle').checked;
-            
+
             [1, 2, 3].forEach(i => {
                 const el = document.getElementById(`step${i}`);
                 el.classList.remove('active', 'completed');
@@ -1784,9 +1793,9 @@
                 // Toggle test name field
                 const nameGroup = document.getElementById('testName').closest('.form-group');
                 if (nameGroup) nameGroup.style.display = isBatch ? 'none' : 'block';
-                
-                document.querySelector('#stepContent2 .card-title').textContent = isBatch 
-                    ? 'Step 2: Configure Common Settings' 
+
+                document.querySelector('#stepContent2 .card-title').textContent = isBatch
+                    ? 'Step 2: Configure Common Settings'
                     : 'Step 2: Configure Test';
             }
 
@@ -1822,7 +1831,7 @@
         // Publish
         async function publishTest() {
             const isBatch = document.getElementById('batchModeToggle').checked;
-            
+
             // Single Mode Validation
             if (!isBatch) {
                 const name = document.getElementById('testName').value;
@@ -1836,7 +1845,7 @@
             const marksPerQ = parseInt(document.getElementById('testMarks').value);
             const negative = parseFloat(document.getElementById('testNegative').value);
             const folderName = document.getElementById('testFolder').value;
-            const subjects = folderName ? [folderName] : ['General']; 
+            const subjects = folderName ? [folderName] : ['General'];
             const type = document.getElementById('testType').value;
             const price = 0; // Price on folder
 
@@ -1953,7 +1962,7 @@
         function resetForm() {
             editingTestId = null;
             clearUpload();
-            if(document.getElementById('batchModeToggle')) {
+            if (document.getElementById('batchModeToggle')) {
                 document.getElementById('batchModeToggle').checked = false; // Reset toggle
             }
             document.getElementById('testName').value = '';
