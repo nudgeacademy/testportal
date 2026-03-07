@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="description" content="Nudge Academy Dashboard - Access CUET mock tests and track your progress">
     <meta name="theme-color" content="#dc2626">
     <link rel="icon" type="image/png" href="favicon.png">
@@ -65,8 +65,14 @@
             color: var(--gray-600);
             line-height: 1.6;
             min-height: 100vh;
-            min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        html {
+            overflow-x: hidden;
+            width: 100vw;
         }
 
         /* Mobile Menu Overlay for Dashboard */
