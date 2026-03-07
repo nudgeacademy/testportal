@@ -52,6 +52,10 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--gray-100);
             min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .result-header {
@@ -1511,7 +1515,7 @@
 
             // Typeset MathJax after DOM update
             if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise().catch(function(err) {
+                MathJax.typesetPromise().catch(function (err) {
                     console.error('MathJax typeset error:', err);
                 });
             }
@@ -1605,6 +1609,12 @@
 
             setTimeout(() => container.innerHTML = '', 5000);
         }
+
+        // Prevent copying and right-click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('copy', event => event.preventDefault());
+        document.addEventListener('cut', event => event.preventDefault());
+        document.addEventListener('paste', event => event.preventDefault());
     </script>
 </body>
 

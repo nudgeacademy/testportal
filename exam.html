@@ -103,6 +103,10 @@
             overflow: hidden;
             touch-action: manipulation;
             /* Disables double-tap to zoom */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         /* Instructions Overlay */
@@ -1979,7 +1983,7 @@
 
             // Typeset MathJax after DOM update
             if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise().catch(function(err) {
+                MathJax.typesetPromise().catch(function (err) {
                     console.error('MathJax typeset error:', err);
                 });
             }
@@ -2216,6 +2220,12 @@
         // Initialize first question
         renderQuestion();
         renderPalette();
+
+        // Prevent copying and right-click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('copy', event => event.preventDefault());
+        document.addEventListener('cut', event => event.preventDefault());
+        document.addEventListener('paste', event => event.preventDefault());
     </script>
 </body>
 
