@@ -3143,9 +3143,9 @@
                 const isFolderPurchased = currentFolderObj.price === 0 || purchases.includes(currentFolderObj.id) || purchases.includes(currentFolderObj.name);
                 const isFreeTest = testIndex === 0 || isFolderPurchased || test.price === 0;
 
-                // GUEST CHECK: Allow free tests without login
-                if (!currentUser && !isFreeTest) {
-                    if (confirm('You need to login to access this test. Go to login page?')) {
+                // GUEST CHECK: Require login for all tests, including free ones
+                if (!currentUser) {
+                    if (confirm('Sign up to access free mocks. Go to login page?')) {
                         window.location.href = 'login.html';
                     }
                     return;
@@ -3343,57 +3343,7 @@
             window.location.href = 'result.html?id=' + (result.id || result.testId);
         }
 
-        // Toast notification
-        function showToast(message, type = 'info') {
-            const existing = document.querySelector('.toast-notification');
-            if (existing) existing.remove();
 
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                padding: 16px 24px;
-                background: ${type === 'success' ? '#16a34a' : type === 'error' ? '#dc2626' : '#3b82f6'};
-                color: white;
-                border-radius: 12px;
-                font-weight: 600;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-                z-index: 10000;
-                animation: slideIn 0.3s ease;
-            `;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Start test function
-        function startTest(testId) {
-            const test = availableTests.find(t => t.id === testId);
-            if (!test) {
-                alert('Test not found!');
-                return;
-            }
-            localStorage.setItem('nudge_current_test', JSON.stringify(test));
-            window.location.href = 'exam.html?id=' + testId;
-        }
-
-        // Start random test
-        function startRandomTest() {
-            if (availableTests.length === 0) {
-                alert('No tests available!');
-                return;
-            }
-            const randomTest = availableTests[Math.floor(Math.random() * availableTests.length)];
-            startTest(randomTest.id);
-        }
-
-        // View all results
-        function viewAllResults() {
-            window.location.href = 'results.html';
-        }
 
         // Render folders helper
         function renderFolders() {
