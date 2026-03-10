@@ -1171,19 +1171,27 @@
             btn.innerHTML = 'Signing in...';
 
             try {
-                // Check in our database
-                const users = await NudgeDB.getAllUsers ? await NudgeDB.getAllUsers() : [];
-                const user = users.find(u => u.email === email && u.password === password);
+                // Sign in with Firebase Authentication
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                const firebaseUser = userCredential.user;
 
-                if (user) {
-                    localStorage.setItem('nudge_user', JSON.stringify(user));
-                    showToast('Login successful!', 'success');
-                    setTimeout(() => window.location.href = 'index.html', 500);
-                } else {
-                    showToast('Invalid email or password', 'error');
-                    btn.disabled = false;
-                    btn.innerHTML = 'Sign In <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>';
+                // Fetch user profile from Firestore
+                let user = await NudgeDB.getUser(firebaseUser.uid);
+
+                if (!user) {
+                    // User exists in Auth but not in Firestore — create a profile
+                    user = {
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+                        purchases: []
+                    };
+                    await NudgeDB.saveUser(user);
                 }
+
+                localStorage.setItem('nudge_user', JSON.stringify(user));
+                showToast('Login successful!', 'success');
+                setTimeout(() => window.location.href = 'index.html', 500);
             } catch (error) {
                 showToast(error.message, 'error');
                 btn.disabled = false;
