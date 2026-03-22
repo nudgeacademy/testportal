@@ -2502,7 +2502,7 @@
             
             if (customBundles.length > 0) {
                 optionsHTML += '<optgroup label="Bundles">' + 
-                    customBundles.map(b => `<option value="${b.id}" data-name="${b.name}">${b.name}</option>`).join('') +
+                    customBundles.map(b => `<option value="bundle_${b.id}" data-name="${b.name}">${b.name}</option>`).join('') +
                     '</optgroup>';
             }
             if (customFolders.length > 0) {
@@ -2571,7 +2571,7 @@
             
             if (customBundles.length > 0) {
                 optionsHTML += '<optgroup label="Bundles">' + 
-                    customBundles.map(b => `<option value="${b.id}" data-name="${b.name}">${b.name}</option>`).join('') +
+                    customBundles.map(b => `<option value="bundle_${b.id}" data-name="${b.name}">${b.name}</option>`).join('') +
                     '</optgroup>';
             }
             if (customFolders.length > 0) {

@@ -826,7 +826,8 @@ const NudgeDB = {
             
             // If the item is a bundle, resolve its folder IDs
             if (itemId.startsWith('bundle_')) {
-                const doc = await db.collection('bundles').doc(itemId).get();
+                const realBundleId = itemId.replace('bundle_', '');
+                const doc = await db.collection('bundles').doc(realBundleId).get();
                 if (doc.exists) {
                     const bundleData = doc.data();
                     if (bundleData.folders && Array.isArray(bundleData.folders)) {
@@ -885,7 +886,8 @@ const NudgeDB = {
             
             // If the item is a bundle, resolve its folder IDs
             if (itemId.startsWith('bundle_')) {
-                const doc = await db.collection('bundles').doc(itemId).get();
+                const realBundleId = itemId.replace('bundle_', '');
+                const doc = await db.collection('bundles').doc(realBundleId).get();
                 if (doc.exists) {
                     const bundleData = doc.data();
                     if (bundleData.folders && Array.isArray(bundleData.folders)) {
