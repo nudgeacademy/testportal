@@ -56,7 +56,6 @@ const ensureAuthReady = () => {
 const NudgeDB = {
     // ========== USER FUNCTIONS ==========
 
-    // Save user profile to Firestore
     async saveUser(user) {
         if (isDemoMode) {
             localStorage.setItem('nudge_user', JSON.stringify(user));
@@ -65,13 +64,45 @@ const NudgeDB = {
 
         await ensureAuthReady();
 
+        let purchases = user.purchases || [];
+        
+        if (!isDemoMode && db) {
+            try {
+                const pendingSnapshot = await db.collection('preGrantedAccess').where('email', '==', user.email.toLowerCase().trim()).get();
+                if (!pendingSnapshot.empty) {
+                    const batch = db.batch();
+                    pendingSnapshot.docs.forEach(doc => {
+                        const data = doc.data();
+                        const purchaseValue = data.folderName || data.folderId;
+                        if (!purchases.includes(purchaseValue)) {
+                            purchases.push(purchaseValue);
+                        }
+                        batch.delete(doc.ref);
+                        
+                        // Add to accessGrants for audit
+                        batch.set(db.collection('accessGrants').doc(), {
+                            userId: user.uid,
+                            itemId: data.folderId,
+                            itemName: data.folderName,
+                            grantedBy: data.grantedBy || 'system_auto_grant',
+                            grantedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    });
+                    await batch.commit();
+                    console.log('✅ Applied pre-granted access for', user.email);
+                }
+            } catch (e) {
+                console.error("Error applying pre-granted access:", e);
+            }
+        }
+
         const userData = {
             uid: user.uid,
             name: user.name || user.displayName || user.email.split('@')[0],
             email: user.email,
             phone: user.phone || '',
             state: user.state || '',
-            purchases: user.purchases || [],
+            purchases: purchases,
             createdAt: user.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -737,6 +768,44 @@ const NudgeDB = {
             return { success: true, message: 'Access granted successfully' };
         } catch (e) {
             console.error('❌ Error granting access:', e);
+            return { success: false, message: e.message };
+        }
+    },
+
+    // Grant access by email (handles both existing and un-registered users)
+    async grantAccessByEmail(email, itemId, itemName = '') {
+        console.log('🔓 Granting access by email:', email, 'for item:', itemId, 'name:', itemName);
+
+        if (isDemoMode) {
+            console.log('📦 Demo mode: simulating access grant by email');
+            return { success: true, message: 'Demo mode - access granted' };
+        }
+
+        try {
+            await ensureAuthReady();
+            const emailLower = email.toLowerCase().trim();
+
+            // First check if user exists
+            const snapshot = await db.collection('users').where('email', '==', emailLower).get();
+            if (!snapshot.empty) {
+                const uid = snapshot.docs[0].id;
+                console.log('User found, calling regular grantAccess');
+                return await this.grantAccess(uid, itemId, itemName);
+            }
+
+            // User does not exist, save to preGrantedAccess
+            await db.collection('preGrantedAccess').add({
+                email: emailLower,
+                folderId: itemId,
+                folderName: itemName,
+                grantedBy: window.ADMIN_USER?.email || 'admin',
+                grantedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            console.log('✅ Access pre-granted to unregistered email');
+            return { success: true, message: 'Access pre-granted successfully. They will receive it upon registration.' };
+        } catch (e) {
+            console.error('❌ Error granting access by email:', e);
             return { success: false, message: e.message };
         }
     },
