@@ -700,6 +700,73 @@ const NudgeDB = {
         return true;
     },
 
+    // ========== BUNDLES FUNCTIONS ==========
+
+    async getBundles() {
+        if (isDemoMode) {
+            return JSON.parse(localStorage.getItem('nudge_custom_bundles') || '[]');
+        }
+
+        try {
+            await ensureAuthReady();
+            const snapshot = await db.collection('bundles').get();
+
+            const bundles = snapshot.docs.map(doc => {
+                return { id: doc.id, ...doc.data() };
+            });
+
+            return bundles;
+        } catch (e) {
+            console.error('❌ Error fetching bundles:', e);
+            return [];
+        }
+    },
+
+    async saveBundle(bundle) {
+        if (isDemoMode) {
+            let bundles = JSON.parse(localStorage.getItem('nudge_custom_bundles') || '[]');
+            if (bundle.id) {
+                const index = bundles.findIndex(b => b.id === bundle.id);
+                if (index > -1) {
+                    bundles[index] = { ...bundles[index], ...bundle };
+                } else {
+                    bundles.push(bundle);
+                }
+            } else {
+                bundle.id = 'bundle_' + Date.now();
+                bundles.push(bundle);
+            }
+            localStorage.setItem('nudge_custom_bundles', JSON.stringify(bundles));
+            return bundle;
+        }
+
+        await ensureAuthReady();
+        const bundleData = { ...bundle };
+
+        if (bundle.id) {
+            bundleData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('bundles').doc(bundle.id).set(bundleData, { merge: true });
+            return bundleData;
+        } else {
+            bundleData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            const docRef = await db.collection('bundles').add(bundleData);
+            return { ...bundleData, id: docRef.id };
+        }
+    },
+
+    async deleteBundle(bundleId) {
+        if (isDemoMode) {
+            let bundles = JSON.parse(localStorage.getItem('nudge_custom_bundles') || '[]');
+            bundles = bundles.filter(b => b.id !== bundleId);
+            localStorage.setItem('nudge_custom_bundles', JSON.stringify(bundles));
+            return true;
+        }
+
+        await ensureAuthReady();
+        await db.collection('bundles').doc(bundleId).delete();
+        return true;
+    },
+
     // ========== ADMIN: USER MANAGEMENT FUNCTIONS ==========
 
     // Get all registered users (admin only)
@@ -746,12 +813,24 @@ const NudgeDB = {
         try {
             await ensureAuthReady();
 
-            // Use folder name for purchases (this is what the student dashboard checks)
-            // Only add one entry to avoid double-counting
-            const purchaseValue = itemName || itemId;
+            let itemsToGrant = [itemName || itemId];
+            
+            // If the item is a bundle, resolve its folder IDs
+            if (itemId.startsWith('bundle_')) {
+                const doc = await db.collection('bundles').doc(itemId).get();
+                if (doc.exists) {
+                    const bundleData = doc.data();
+                    if (bundleData.folders && Array.isArray(bundleData.folders)) {
+                        itemsToGrant = [...itemsToGrant, ...bundleData.folders];
+                    }
+                }
+            }
+            
+            // Remove duplicates
+            itemsToGrant = [...new Set(itemsToGrant)];
 
             await db.collection('users').doc(uid).set({
-                purchases: firebase.firestore.FieldValue.arrayUnion(purchaseValue),
+                purchases: firebase.firestore.FieldValue.arrayUnion(...itemsToGrant),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
 

@@ -1086,6 +1086,13 @@
                     </svg>
                     Folders
                 </a>
+                <a class="nav-item" data-section="bundles" id="sidebarBundlesBtn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    Bundles
+                </a>
                 <a class="nav-item" id="sidebarCreateTestBtn">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -1218,6 +1225,62 @@
                                     <tr>
                                         <td colspan="5">
                                             <div class="empty-state">No folders created yet</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bundles Management -->
+                <div class="section-panel" id="section-bundles">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title" id="bundleFormTitle">Create New Bundle</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Bundle Name</label>
+                                    <input type="text" id="bundleName" placeholder="e.g. Master Course Bundle">
+                                </div>
+                                <div class="form-group">
+                                    <label>Price (₹)</label>
+                                    <input type="number" id="bundlePrice" value="499" min="0">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>Select Folders to Include</label>
+                                    <div id="bundleFoldersList" style="max-height: 200px; overflow-y: auto; border: 2px solid var(--gray-200); border-radius: var(--radius); padding: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+                                        <!-- Checkboxes populated by JS -->
+                                    </div>
+                                </div>
+                                <div class="form-group full-width" style="display:flex; justify-content:flex-end; gap: 8px; margin-top: 16px;">
+                                    <button class="btn btn-primary" id="saveBundleBtn" onclick="saveBundleHandler()">+ Create Bundle</button>
+                                    <button class="btn btn-secondary" id="cancelBundleEditBtn" onclick="resetBundleForm()" style="display:none;">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Existing Bundles</h2>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Folders Included</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bundlesTable">
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="empty-state">No bundles created yet</div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -1587,6 +1650,9 @@
         let customFolders = [];
         let editingTestId = null;
 
+        let customBundles = [];
+        let editingBundleId = null;
+
         // Display Admin Name
         document.getElementById('adminAvatar').textContent = (adminUser.name || adminUser.email || 'A').charAt(0).toUpperCase();
 
@@ -1594,18 +1660,20 @@
         async function initData() {
             try {
                 showToast('Loading data...', 'info');
-                const [tests, folders] = await Promise.all([
+                const [tests, folders, bundles] = await Promise.all([
                     (async () => (await NudgeDB.getTests(true)) || [])(),
-                    (async () => (await NudgeDB.getFolders()) || [])()
+                    (async () => (await NudgeDB.getFolders()) || [])(),
+                    (async () => (await NudgeDB.getBundles()) || [])()
                 ]);
 
                 customTests = tests;
                 customFolders = folders;
+                customBundles = bundles;
 
                 renderTests();
                 renderFolders();
                 renderStudents();
-                showToast(`Loaded ${tests.length} tests, ${folders.length} folders`, 'success');
+                showToast(`Loaded ${tests.length} tests, ${folders.length} folders, ${bundles.length} bundles`, 'success');
             } catch (e) {
                 console.error("Error loading data:", e);
                 showToast('Error loading data: ' + e.message, 'error');
@@ -1645,6 +1713,10 @@
             else if (section === 'folders') {
                 title = 'Manage Folders';
                 renderFolders();
+            }
+            else if (section === 'bundles') {
+                title = 'Manage Bundles';
+                renderBundles();
             }
             else if (section === 'students') {
                 title = 'Students';
@@ -2224,25 +2296,39 @@
             const tbody = document.getElementById('foldersTable');
             if (customFolders.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">No folders created yet</div></td></tr>';
-                return;
+            } else {
+                tbody.innerHTML = customFolders.map(f => {
+                    const count = customTests.filter(t => t.subjects && t.subjects[0] === f.name).length;
+                    return `
+                        <tr>
+                            <td><strong>${f.name}</strong></td>
+                            <td>₹${f.price}</td>
+                            <td><span style="font-size:1.5rem">${f.icon}</span></td>
+                            <td><span class="badge badge-success">${count} Tests</span></td>
+                            <td style="display:flex; gap:8px;">
+                                <button class="btn btn-secondary btn-sm" onclick="editFolder('${f.id}')">Edit</button>
+                                <button class="btn btn-info btn-sm" onclick="openReorderModal('${f.name}')">Reorder</button>
+                                <button class="btn btn-outline btn-sm" onclick="deleteFolder('${f.id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
             }
 
-            tbody.innerHTML = customFolders.map(f => {
-                const count = customTests.filter(t => t.subjects && t.subjects[0] === f.name).length;
-                return `
-                    <tr>
-                        <td><strong>${f.name}</strong></td>
-                        <td>₹${f.price}</td>
-                        <td><span style="font-size:1.5rem">${f.icon}</span></td>
-                        <td><span class="badge badge-success">${count} Tests</span></td>
-                        <td style="display:flex; gap:8px;">
-                            <button class="btn btn-secondary btn-sm" onclick="editFolder('${f.id}')">Edit</button>
-                            <button class="btn btn-info btn-sm" onclick="openReorderModal('${f.name}')">Reorder</button>
-                            <button class="btn btn-outline btn-sm" onclick="deleteFolder('${f.id}')">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            // Update bundle checkboxes
+            const bundleFoldersList = document.getElementById('bundleFoldersList');
+            if (bundleFoldersList) {
+                if (customFolders.length === 0) {
+                    bundleFoldersList.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;">No folders available</div>';
+                } else {
+                    bundleFoldersList.innerHTML = customFolders.map(f => `
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="checkbox" class="bundle-folder-cb" value="${f.id}" style="width:16px; height:16px; margin:0;">
+                            ${f.name} (₹${f.price || 0})
+                        </label>
+                    `).join('');
+                }
+            }
         }
 
         async function deleteFolder(id) {
@@ -2313,6 +2399,103 @@
             }
         }
 
+        // ========== BUNDLE MANAGEMENT FUNCTIONS ==========
+        async function saveBundleHandler() {
+            const name = document.getElementById('bundleName').value.trim();
+            const price = parseInt(document.getElementById('bundlePrice').value) || 0;
+            
+            const folderCheckboxes = document.querySelectorAll('.bundle-folder-cb:checked');
+            const folders = Array.from(folderCheckboxes).map(cb => cb.value);
+
+            if (!name) { showToast('Bundle name is required', 'error'); return; }
+            if (folders.length === 0) { showToast('Please select at least one folder', 'error'); return; }
+
+            const bundleData = { name, price, folders };
+            const btn = document.getElementById('saveBundleBtn');
+            const originalText = btn.textContent;
+            
+            btn.disabled = true;
+            btn.textContent = editingBundleId ? 'Updating...' : 'Creating...';
+
+            try {
+                if (editingBundleId) bundleData.id = editingBundleId;
+                await NudgeDB.saveBundle(bundleData);
+                showToast(editingBundleId ? 'Bundle updated!' : 'Bundle created!', 'success');
+                resetBundleForm();
+                await initData();
+            } catch (err) {
+                showToast('Error saving bundle: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        function editBundle(id) {
+            const bundle = customBundles.find(b => b.id === id);
+            if (!bundle) return;
+            
+            editingBundleId = id;
+            document.getElementById('bundleName').value = bundle.name || '';
+            document.getElementById('bundlePrice').value = bundle.price || 0;
+            
+            document.querySelectorAll('.bundle-folder-cb').forEach(cb => {
+                cb.checked = (bundle.folders || []).includes(cb.value);
+            });
+
+            document.getElementById('bundleFormTitle').textContent = 'Edit Bundle';
+            document.getElementById('saveBundleBtn').textContent = 'Update Bundle';
+            document.getElementById('cancelBundleEditBtn').style.display = 'inline-block';
+            document.getElementById('section-bundles').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetBundleForm() {
+            editingBundleId = null;
+            document.getElementById('bundleName').value = '';
+            document.getElementById('bundlePrice').value = '499';
+            document.querySelectorAll('.bundle-folder-cb').forEach(cb => cb.checked = false);
+            
+            document.getElementById('bundleFormTitle').textContent = 'Create New Bundle';
+            document.getElementById('saveBundleBtn').textContent = '+ Create Bundle';
+            document.getElementById('cancelBundleEditBtn').style.display = 'none';
+        }
+
+        async function deleteBundle(id) {
+            if (!confirm('Are you sure you want to delete this bundle?')) return;
+            try {
+                await NudgeDB.deleteBundle(id);
+                showToast('Bundle deleted', 'success');
+                await initData();
+            } catch (err) {
+                showToast('Error deleting bundle: ' + err.message, 'error');
+            }
+        }
+
+        function renderBundles() {
+            const tbody = document.getElementById('bundlesTable');
+            if (customBundles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state">No bundles created yet</div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = customBundles.map(bundle => {
+                const foldersCount = (bundle.folders || []).length;
+                return `
+                    <tr>
+                        <td style="font-weight:600;"><span class="icon">📦</span> ${bundle.name || 'Unnamed Bundle'}</td>
+                        <td>${bundle.price === 0 ? '<span class="badge" style="background:var(--green-bg); color:var(--green);">Free</span>' : '₹' + bundle.price}</td>
+                        <td><span class="badge">${foldersCount} Folders</span></td>
+                        <td>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn btn-outline btn-sm" onclick="editBundle('${bundle.id}')">Edit</button>
+                                <button class="btn btn-outline btn-sm" style="color:var(--primary); border-color:var(--primary);" onclick="deleteBundle('${bundle.id}')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         // ========== GRANT ACCESS MODAL FUNCTIONS ==========
         let selectedStudentForGrant = null;
 
@@ -2324,8 +2507,19 @@
 
             // Populate folder dropdown
             const select = document.getElementById('grantAccessFolder');
-            select.innerHTML = '<option value="">Select a folder...</option>' +
-                customFolders.map(f => `<option value="${f.id}" data-name="${f.name}">${f.name} (₹${f.price})</option>`).join('');
+            let optionsHTML = '<option value="">Select a folder/bundle...</option>';
+            
+            if (customBundles.length > 0) {
+                optionsHTML += '<optgroup label="Bundles">' + 
+                    customBundles.map(b => `<option value="${b.id}" data-name="${b.name}">${b.name} (₹${b.price || 0})</option>`).join('') +
+                    '</optgroup>';
+            }
+            if (customFolders.length > 0) {
+                optionsHTML += '<optgroup label="Folders">' +
+                    customFolders.map(f => `<option value="${f.id}" data-name="${f.name}">${f.name} (₹${f.price})</option>`).join('') +
+                    '</optgroup>';
+            }
+            select.innerHTML = optionsHTML;
 
             // Show modal
             document.getElementById('grantAccessModal').classList.add('active');
@@ -2381,10 +2575,20 @@
         function showGrantAccessByEmailModal() {
             document.getElementById('grantAccessEmailInput').value = '';
             
-            // Populate folder dropdown
             const select = document.getElementById('grantAccessByEmailFolder');
-            select.innerHTML = '<option value="">Select a folder...</option>' +
-                customFolders.map(f => `<option value="${f.id}" data-name="${f.name}">${f.name} (₹${f.price})</option>`).join('');
+            let optionsHTML = '<option value="">Select a folder/bundle...</option>';
+            
+            if (customBundles.length > 0) {
+                optionsHTML += '<optgroup label="Bundles">' + 
+                    customBundles.map(b => `<option value="${b.id}" data-name="${b.name}">${b.name} (₹${b.price || 0})</option>`).join('') +
+                    '</optgroup>';
+            }
+            if (customFolders.length > 0) {
+                optionsHTML += '<optgroup label="Folders">' +
+                    customFolders.map(f => `<option value="${f.id}" data-name="${f.name}">${f.name} (₹${f.price})</option>`).join('') +
+                    '</optgroup>';
+            }
+            select.innerHTML = optionsHTML;
 
             document.getElementById('grantAccessByEmailModal').classList.add('active');
         }
