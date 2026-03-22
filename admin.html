@@ -1245,10 +1245,6 @@
                                     <label>Bundle Name</label>
                                     <input type="text" id="bundleName" placeholder="e.g. Master Course Bundle">
                                 </div>
-                                <div class="form-group">
-                                    <label>Price (₹)</label>
-                                    <input type="number" id="bundlePrice" value="499" min="0">
-                                </div>
                                 <div class="form-group full-width">
                                     <label>Select Folders to Include</label>
                                     <div id="bundleFoldersList" style="max-height: 200px; overflow-y: auto; border: 2px solid var(--gray-200); border-radius: var(--radius); padding: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
@@ -1272,14 +1268,13 @@
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Price</th>
                                         <th>Folders Included</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="bundlesTable">
                                     <tr>
-                                        <td colspan="4">
+                                        <td colspan="3">
                                             <div class="empty-state">No bundles created yet</div>
                                         </td>
                                     </tr>
@@ -2402,7 +2397,6 @@
         // ========== BUNDLE MANAGEMENT FUNCTIONS ==========
         async function saveBundleHandler() {
             const name = document.getElementById('bundleName').value.trim();
-            const price = parseInt(document.getElementById('bundlePrice').value) || 0;
             
             const folderCheckboxes = document.querySelectorAll('.bundle-folder-cb:checked');
             const folders = Array.from(folderCheckboxes).map(cb => cb.value);
@@ -2410,7 +2404,7 @@
             if (!name) { showToast('Bundle name is required', 'error'); return; }
             if (folders.length === 0) { showToast('Please select at least one folder', 'error'); return; }
 
-            const bundleData = { name, price, folders };
+            const bundleData = { name, folders };
             const btn = document.getElementById('saveBundleBtn');
             const originalText = btn.textContent;
             
@@ -2437,7 +2431,6 @@
             
             editingBundleId = id;
             document.getElementById('bundleName').value = bundle.name || '';
-            document.getElementById('bundlePrice').value = bundle.price || 0;
             
             document.querySelectorAll('.bundle-folder-cb').forEach(cb => {
                 cb.checked = (bundle.folders || []).includes(cb.value);
@@ -2452,7 +2445,6 @@
         function resetBundleForm() {
             editingBundleId = null;
             document.getElementById('bundleName').value = '';
-            document.getElementById('bundlePrice').value = '499';
             document.querySelectorAll('.bundle-folder-cb').forEach(cb => cb.checked = false);
             
             document.getElementById('bundleFormTitle').textContent = 'Create New Bundle';
@@ -2474,7 +2466,7 @@
         function renderBundles() {
             const tbody = document.getElementById('bundlesTable');
             if (customBundles.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state">No bundles created yet</div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3"><div class="empty-state">No bundles created yet</div></td></tr>';
                 return;
             }
 
@@ -2483,7 +2475,6 @@
                 return `
                     <tr>
                         <td style="font-weight:600;"><span class="icon">📦</span> ${bundle.name || 'Unnamed Bundle'}</td>
-                        <td>${bundle.price === 0 ? '<span class="badge" style="background:var(--green-bg); color:var(--green);">Free</span>' : '₹' + bundle.price}</td>
                         <td><span class="badge">${foldersCount} Folders</span></td>
                         <td>
                             <div style="display:flex; gap:8px;">
@@ -2511,7 +2502,7 @@
             
             if (customBundles.length > 0) {
                 optionsHTML += '<optgroup label="Bundles">' + 
-                    customBundles.map(b => `<option value="${b.id}" data-name="${b.name}">${b.name} (₹${b.price || 0})</option>`).join('') +
+                    customBundles.map(b => `<option value="${b.id}" data-name="${b.name}">${b.name}</option>`).join('') +
                     '</optgroup>';
             }
             if (customFolders.length > 0) {
@@ -2580,7 +2571,7 @@
             
             if (customBundles.length > 0) {
                 optionsHTML += '<optgroup label="Bundles">' + 
-                    customBundles.map(b => `<option value="${b.id}" data-name="${b.name}">${b.name} (₹${b.price || 0})</option>`).join('') +
+                    customBundles.map(b => `<option value="${b.id}" data-name="${b.name}">${b.name}</option>`).join('') +
                     '</optgroup>';
             }
             if (customFolders.length > 0) {
