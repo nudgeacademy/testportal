@@ -73,10 +73,19 @@ const NudgeDB = {
                     const batch = db.batch();
                     pendingSnapshot.docs.forEach(doc => {
                         const data = doc.data();
-                        const purchaseValue = data.folderName || data.folderId;
-                        if (!purchases.includes(purchaseValue)) {
-                            purchases.push(purchaseValue);
+                        
+                        let itemsToGrant = [];
+                        if (data.itemsToGrant && Array.isArray(data.itemsToGrant)) {
+                            itemsToGrant = data.itemsToGrant;
+                        } else {
+                            const purchaseValue = data.folderName || data.folderId;
+                            if (purchaseValue) itemsToGrant.push(purchaseValue);
                         }
+
+                        itemsToGrant.forEach(item => {
+                            if (!purchases.includes(item)) purchases.push(item);
+                        });
+
                         batch.delete(doc.ref);
                         
                         // Add to accessGrants for audit
@@ -872,9 +881,25 @@ const NudgeDB = {
                 return await this.grantAccess(uid, itemId, itemName);
             }
 
+            let itemsToGrant = [itemName || itemId];
+            
+            // If the item is a bundle, resolve its folder IDs
+            if (itemId.startsWith('bundle_')) {
+                const doc = await db.collection('bundles').doc(itemId).get();
+                if (doc.exists) {
+                    const bundleData = doc.data();
+                    if (bundleData.folders && Array.isArray(bundleData.folders)) {
+                        itemsToGrant = [...itemsToGrant, ...bundleData.folders];
+                    }
+                }
+            }
+            
+            itemsToGrant = [...new Set(itemsToGrant)];
+
             // User does not exist, save to preGrantedAccess
             await db.collection('preGrantedAccess').add({
                 email: emailLower,
+                itemsToGrant: itemsToGrant,
                 folderId: itemId,
                 folderName: itemName,
                 grantedBy: window.ADMIN_USER?.email || 'admin',
